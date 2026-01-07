@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.12.13)  7 JAN 2026 10:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.12.13)  7 JAN 2026 11:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -3029,7 +3029,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 780.
 
 ]
 <images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ.png,
- id=1424, 1217.2978pt x 627.84563pt>
+ id=1425, 1217.2978pt x 627.84563pt>
 File: images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ
 .png Graphic file (type png)
 <use images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ.
@@ -3045,6 +3045,27 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 787.
 
  <./images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ.p
 ng>]
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 810.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [44
+
+]
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 833.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [45
+
+]
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 856.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [46
+
+]
 \tf@nav=\write9
 \openout9 = `main.nav'.
 
@@ -3066,10 +3087,10 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 71531 strings out of 467871
- 1709668 string characters out of 5418375
+ 71541 strings out of 467871
+ 1709761 string characters out of 5418375
  2734017 words of memory out of 5000000
- 99093 multiletter control sequences out of 15000+600000
+ 99097 multiletter control sequences out of 15000+600000
  651049 words of font info for 134 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,15n,123p,1869b,1050s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -3085,9 +3106,9 @@ ams/MiKTeX/fonts/type1/vntex/vnr/vnss8.pfb><C:/Users/ADMIN/AppData/Local/Progra
 ms/MiKTeX/fonts/type1/vntex/vnr/vnssbx10.pfb><C:/Users/ADMIN/AppData/Local/Prog
 rams/MiKTeX/fonts/type1/vntex/vnr/vnssi10.pfb><C:/Users/ADMIN/AppData/Local/Pro
 grams/MiKTeX/fonts/type1/vntex/vnr/vntt10.pfb>
-Output written on main.pdf (43 pages, 8277501 bytes).
+Output written on main.pdf (46 pages, 8296807 bytes).
 PDF statistics:
- 1529 PDF objects out of 1728 (max. 8388607)
- 126 named destinations out of 1000 (max. 500000)
+ 1611 PDF objects out of 1728 (max. 8388607)
+ 132 named destinations out of 1000 (max. 500000)
  37328 words of extra memory for PDF output out of 42996 (max. 10000000)
 
