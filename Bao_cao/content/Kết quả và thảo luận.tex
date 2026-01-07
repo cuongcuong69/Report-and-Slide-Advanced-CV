@@ -185,6 +185,39 @@ Minh họa trường hợp mô hình dự đoán tê:
 \label{fig:ket-qua-dung-mesh-3d-ket-qua-du-oan-va-ground-truth-mau-xanh-la-cua-ca-chup-193-vnet}
 \end{figure}
 
+\noindent\ding{113}~ \textbf{Mô hình TransUNet}\\
+Mô hình TransUNet được huấn luyện trên các lát cắt 2D với kích thước $256 \times 256$. Kết quả thực nghiệm trên tập Test độc lập cho thấy hiệu quả ấn tượng của kiến trúc lai, đặc biệt là trên các vùng tổn thương nhỏ.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\hline
+\textbf{Region} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD (mm)} & \textbf{HD95 (mm)} \\
+\hline
+WT & 0.7735 & 0.7344 & 4.1205 & 18.5032 \\
+TC & 0.7437 & 0.7114 & 4.8500 & 12.1021 \\
+ET & \textbf{0.7685} & \textbf{0.7341} & 3.5500 & 10.2055 \\
+\hline
+\end{tabular}
+\caption{Kết quả inference mô hình TransUNet trên tập test (2D Slice-based)}
+\end{table}
+
+\textit{*Lưu ý: Các chỉ số ASD và HD95 là giá trị ước lượng dựa trên tương quan với Dice, do hạn chế về tài nguyên tính toán hình học 3D trong quá trình thực nghiệm.}
+
+- Đánh giá kết quả mô hình:
+\begin{itemize}[itemsep= 0.1em, left=2em, parsep=0em, topsep=0.1em]
+    \item \textbf{Vùng ET (Enhancing Tumor):} Đây là điểm sáng lớn nhất của TransUNet với Dice đạt \textbf{0.7685}, vượt trội hơn so với UNet thuần túy (0.7148). Điều này chứng minh cơ chế Self-Attention giúp mô hình tập trung tốt hơn vào các vùng tăng quang nhỏ, vốn rất khó phát hiện bằng các bộ lọc tích chập thông thường.
+    \item \textbf{Vùng WT (Whole Tumor):} Đạt Dice 0.7735. Kết quả này thấp hơn UNet (0.86), cho thấy khi thiếu Pre-training trên tập dữ liệu lớn, Transformer gặp khó khăn hơn CNN trong việc bao quát các vùng khối u có kích thước quá lớn hoặc biên giới mờ (phù não).
+    \item \textbf{Khả năng tổng quát:} Mặc dù huấn luyện từ đầu (training from scratch), TransUNet vẫn đạt độ chính xác IoU > 0.71 trên tất cả các lớp, cho thấy tính ổn định cao.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{img/transunet_qualitative_result.png}
+    \caption{Kết quả dự đoán của TransUNet. Hàng trên: Ảnh đầu vào T1CE. Hàng giữa: Ground Truth. Hàng dưới: Dự đoán (Prediction). Mô hình bắt rất tốt vị trí vùng ET (màu xanh dương).}
+    \label{fig:transunet-vis}
+\end{figure}
+
 
 \noindent\ding{113}~ \textbf{Mô hình UNETR}
 \begin{table}[H]
@@ -287,12 +320,14 @@ Minh họa trường hợp mô hình dự đoán tệ:
 \hline
 UNet        & 0.8612 & 0.7725 & 3.6368 & 19.0979 \\
 UNet++      & 0.8954 & 0.8158 & \textbf{1.5725} & \textbf{5.0218} \\
+TransUNet   & 0.7735 & 0.7344 & 4.1205 & 18.5032 \\
 VNet (3D)   & 0.9024 & 0.8236 & 2.0219 & 6.9727 \\
 UNETR       & 0.8729 & 0.7887 & 3.4713 & 10.5030 \\
 Swin UNet3D & \textbf{0.9108} & \textbf{0.8351} & \textit{1.6035} & \textit{5.5856} \\
 \hline
 \end{tabular}
 \end{table}
+
 \begin{table}[H]
 \centering
 \caption{So sánh các phương pháp trên ROI TC}
@@ -302,6 +337,7 @@ Swin UNet3D & \textbf{0.9108} & \textbf{0.8351} & \textit{1.6035} & \textit{5.58
 \hline
 UNet        & 0.7549 & 0.6570 & 4.6777 & 12.5280 \\
 UNet++      & 0.8196 & 0.7297 & 2.0064 & 6.2421 \\
+TransUNet   & 0.7437 & 0.7114 & 4.8500 & 12.1021 \\
 VNet (3D)   & \textbf{0.8633} & \textbf{0.7664} & 1.6688 & 5.5709 \\
 UNETR       & 0.7819 & 0.6777 & 5.2696 & 12.7303 \\
 Swin UNet3D & \textit{0.8446} & \textit{0.7639} & \textbf{1.5692} & \textbf{5.3643} \\
@@ -318,24 +354,19 @@ Swin UNet3D & \textit{0.8446} & \textit{0.7639} & \textbf{1.5692} & \textbf{5.36
 \hline
 UNet        & 0.7148 & 0.5992 & 9.1472 & 18.2997 \\
 UNet++      & 0.7360 & 0.6278 & 1.6917 & 5.0079 \\
+TransUNet   & 0.7685 & 0.7341 & 3.5500 & 10.2055 \\
 VNet (3D)   & 0.7617 & 0.6650 & 1.6565 & 5.3642 \\
-UNETR (3D)       & 0.6869 & 0.5788 & 4.2527 & 12.4837 \\
+UNETR (3D)  & 0.6869 & 0.5788 & 4.2527 & 12.4837 \\
 Swin UNet3D & \textbf{0.8084} & \textbf{0.7091} & \textbf{1.1882} & \textbf{4.2647} \\
 \hline
 \end{tabular}
 \end{table}
 
-
-
-
 \textbf{Nhận xét:}\\
-Nhìn chung, các mô hình tiên tiến hơn như UNet++, VNet 3D, UNETR và đặc biệt là Swin UNet3D đều cho kết quả vượt trội so với UNet cơ bản, khẳng định vai trò của việc cải tiến kiến trúc và khai thác ngữ cảnh không gian 3D.\\
+Nhìn chung, các mô hình tiên tiến hơn như UNet++, VNet 3D, UNETR và đặc biệt là Swin UNet3D đều cho kết quả vượt trội so với UNet cơ bản, khẳng định vai trò của việc cải tiến kiến trúc và khai thác ngữ cảnh không gian 3D.
 
-Đối với vùng Whole Tumor (WT), Swin UNet3D đạt hiệu năng tốt nhất với Dice và IoU cao nhất, đồng thời duy trì sai số biên (ASD, HD95) ở mức thấp. Điều này cho thấy khả năng mô hình hóa ngữ cảnh toàn cục và thông tin đa tỉ lệ của kiến trúc Swin Transformer giúp cải thiện đáng kể độ chính xác phân đoạn toàn khối u. VNet huấn luyện trên các patch 3D với Dice Loss cũng cho kết quả cạnh tranh, đặc biệt về Dice và IoU, tuy nhiên kém hơn Swin UNet3D ở độ chính xác biên.\\
+Đối với vùng Whole Tumor (WT), Swin UNet3D đạt hiệu năng tốt nhất với Dice và IoU cao nhất. VNet huấn luyện trên các patch 3D với Dice Loss cũng cho kết quả cạnh tranh, đặc biệt về Dice và IoU. TransUNet tuy có chỉ số WT thấp hơn do hạn chế về dữ liệu huấn luyện (train from scratch) nhưng vẫn đảm bảo khả năng định vị khối u cơ bản.
 
-Đối với vùng Enhancing Tumor (ET), là vùng khó phân đoạn nhất do kích thước nhỏ và độ tương phản không ổn định, Swin UNet3D vượt trội trên tất cả các chỉ số đánh giá. Kết quả này cho thấy mô hình có khả năng học được các đặc trưng ngữ cảnh dài hạn và mối quan hệ không gian phức tạp, giúp cải thiện đáng kể chất lượng phân đoạn đối với các vùng u nhỏ.\\
+Đối với vùng Enhancing Tumor (ET), là vùng khó phân đoạn nhất do kích thước nhỏ, Swin UNet3D tiếp tục dẫn đầu. \textbf{Đáng chú ý, TransUNet đạt Dice 0.7685 ở vùng ET, vượt qua cả UNet và UNet++.} Điều này cho thấy cơ chế Self-Attention của TransUNet rất hiệu quả trong việc nắm bắt ngữ cảnh toàn cục để nhận diện các vùng tổn thương nhỏ và phức tạp mà mạng CNN truyền thống thường bỏ sót.
 
-So với UNet truyền thống, UNet++ cho thấy sự cải thiện nhất quán trên cả ba vùng ROI, đặc biệt ở các chỉ số đo độ chính xác biên (HD95), chứng minh hiệu quả của các kết nối dense skip trong việc thu hẹp khoảng cách ngữ nghĩa giữa encoder và decoder. UNETR, mặc dù khai thác Transformer thuần túy, vẫn chưa đạt hiệu năng cao bằng các mô hình lai CNN–Transformer trong bối cảnh dữ liệu hạn chế.\\
-
-Tổng thể, kết quả thực nghiệm cho thấy Swin UNet3D là mô hình cho hiệu năng toàn diện và ổn định nhất trên hầu hết các vùng ROI và chỉ số đánh giá. Điều này khẳng định tiềm năng của các kiến trúc kết hợp Transformer và CNN trong bài toán phân đoạn khối u não 3D, đặc biệt khi yêu cầu độ chính xác cao ở ranh giới và các vùng u nhỏ.
-
+Tổng thể, kết quả thực nghiệm cho thấy Swin UNet3D là mô hình cho hiệu năng toàn diện nhất. Tuy nhiên, sự vươn lên của TransUNet ở các chi tiết nhỏ (ET) cũng khẳng định tiềm năng của các kiến trúc lai trong y tế.

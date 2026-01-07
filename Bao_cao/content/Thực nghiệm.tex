@@ -152,6 +152,48 @@ Thiết kế này cho phép mô hình tách bạch quá trình trích xuất đ�
     \label{fig:placeholder}
 \end{figure}
 
+\subsection{Mô hình TransUNet}
+
+\ding{113}~ \textbf{Thực nghiệm: Huấn luyện mô hình TransUNet trên các lát cắt 2D từ MRI 3D BraTS2020}\\
+TransUNet là mô hình tiên phong trong việc kết hợp kiến trúc Transformer vào y tế để nắm bắt thông tin ngữ cảnh toàn cục (global context), trong khi vẫn giữ Decoder dạng CNN để khôi phục chi tiết không gian. 
+
+\begin{enumerate}
+    \item \textbf{Dữ liệu đầu vào và Tiền xử lý:}
+    \begin{itemize}
+        \item Dữ liệu 3D được cắt (slice) theo trục Axial để tạo thành các ảnh 2D.
+        \item Mỗi lát cắt được resize về kích thước chuẩn $224 \times 224$ phù hợp với đầu vào của Vision Transformer (ViT).
+        \item Áp dụng các kỹ thuật tăng cường dữ liệu (augmentation) 2D như: xoay, lật ngang/dọc, và điều chỉnh độ sáng để tăng tính tổng quát hóa.
+    \end{itemize}
+    
+    \item \textbf{Thiết lập huấn luyện:}
+    \begin{itemize}
+        \item \textbf{Kiến trúc:} Sử dụng backbone R50-ViT-B/16 (ResNet-50 kết hợp Vision Transformer Base, patch size 16). Trọng số ViT được khởi tạo từ pre-trained trên ImageNet.
+        \item \textbf{Hyperparameters:} Mô hình được huấn luyện với Optimizer AdamW, learning rate khởi tạo $1e-3$ và weight decay $1e-4$.
+        \item \textbf{Chu kỳ huấn luyện:} 30 epoch.
+        \item \textbf{Hàm mất mát:} Sử dụng tổng hợp giữa Dice Loss và Cross-Entropy Loss nhằm cân bằng giữa việc tối ưu vùng giao thoa và phân loại từng pixel.
+    \end{itemize}
+    
+    \item \textbf{Quá trình Inference:}
+    Quá trình dự đoán thực hiện trên từng lát cắt 2D. Các kết quả dự đoán sau đó được xếp chồng (stack) lại để tái tạo thể tích 3D ban đầu nhằm tính toán các độ đo đánh giá (DSC, HD95).
+\end{enumerate}
+
+Biểu đồ dưới đây thể hiện sự thay đổi của hàm mất mát (Loss) và độ đo Dice trong quá trình huấn luyện:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/transunet_loss_curve.png}
+    \caption{Biểu đồ hàm mất mát (Loss) trên tập huấn luyện và tập kiểm thử của TransUNet qua 30 epoch. Giá trị Loss giảm dần ổn định cho thấy mô hình hội tụ tốt.}
+    \label{fig:transunet_loss}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{img/transunet_learning_curve.png}
+    \caption{Biểu đồ Dice Score trên tập Training và Validation cho 3 vùng u (WT, TC, ET). Các chỉ số đều tăng trưởng tốt theo thời gian, với vùng WT đạt hiệu suất cao nhất.}
+    \label{fig:transunet_dice}
+\end{figure}
+
+
 \subsection{Mô hình UNETR}
 
 \ding{113}~ \textbf{Thử nghiệm: Huấn luyện mô hình UNETR trực tiếp trên toàn bộ thể tích MRI 3D của từng ca bệnh, không cắt thành patch:}

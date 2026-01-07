@@ -147,6 +147,47 @@ V-Net sử dụng các skip connection giữa các stage đối xứng của hai
 
 Sau khi đi qua toàn bộ các stage decoder, VNet sử dụng một lớp tích chập $1 \times 1 \times 1$ để đưa số kênh về đúng số lớp cần phân đoạn trước khi áp dụng softmax voxel-wise để sinh phân bố xác xuất cho từng voxel.
 
+\subsection{TransUNet}
+TransUNet \cite{chen2021transunet} là kiến trúc đầu tiên khai thác thành công tiềm năng của Transformer trong bài toán phân đoạn ảnh y tế, vốn trước đây bị thống trị bởi các mạng tích chập (CNN). Hạn chế cố hữu của CNN là tính cục bộ (locality) của các phép tích chập, khiến chúng gặp khó khăn trong việc mô hình hóa các mối quan hệ phụ thuộc dài hạn (long-range dependencies). Mặc dù có thể mở rộng vùng tiếp nhận (receptive field) bằng cách chồng nhiều lớp tích chập và pooling, nhưng điều này thường làm mất mát thông tin chi tiết về không gian.
+
+Để giải quyết vấn đề này, TransUNet đề xuất cơ chế lai: sử dụng Transformer để mã hóa các đặc trưng toàn cục từ biểu diễn chuỗi của ảnh, sau đó kết hợp với các đặc trưng không gian chi tiết từ CNN thông qua kiến trúc U-Net.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth]{img/transunet_architecture.png}
+    \caption{Sơ đồ kiến trúc TransUNet \cite{chen2021transunet}. Ảnh đầu vào được mã hóa qua CNN, sau đó chuyển thành chuỗi token để Transformer xử lý ngữ cảnh toàn cục, cuối cùng được giải mã bởi CUP.}
+    \label{fig:transunet-architect}
+\end{figure}
+
+\subsubsection{Mã hóa đặc trưng và Token hóa (Feature Embedding)}
+Thay vì áp dụng Transformer trực tiếp lên các điểm ảnh thô (như ViT nguyên bản), TransUNet tận dụng một mạng CNN (ví dụ ResNet-50) để trích xuất feature map đầu vào. Giả sử đầu vào là $\mathbf{x} \in \mathbb{R}^{H \times W \times C}$. CNN sẽ tạo ra feature map trung gian.
+
+Feature map này sau đó được token hóa bằng cách chia thành các mảnh nhỏ (patches). Giả sử kích thước mỗi patch là $P \times P$, chuỗi đầu vào $\mathbf{x}_p$ cho Transformer được tạo thành bằng cách duỗi phẳng các patch:
+\begin{equation}
+\mathbf{x}_p = \{x_p^1, x_p^2, \dots, x_p^N\}, \quad \text{với } N = \frac{HW}{P^2}
+\end{equation}
+trong đó $N$ là tổng số lượng patch (độ dài chuỗi). Các patch này sau đó được chiếu tuyến tính (linear projection) vào một không gian vector ẩn có số chiều $D$, cộng với thông tin vị trí (position embedding) để bảo toàn thông tin không gian:
+\begin{equation}
+\mathbf{z}_0 = [\mathbf{x}_p^1\mathbf{E}; \mathbf{x}_p^2\mathbf{E}; \dots; \mathbf{x}_p^N\mathbf{E}] + \mathbf{E}_{pos}
+\end{equation}
+với $\mathbf{E} \in \mathbb{R}^{(P^2 \cdot C) \times D}$ là ma trận chiếu tuyến tính và $\mathbf{E}_{pos}$ là vector vị trí.
+
+\subsubsection{Transformer Encoder và Self-Attention}
+Thành phần cốt lõi của TransUNet là khối Transformer Encoder, bao gồm các lớp Multihead Self-Attention (MSA) và Multi-Layer Perceptron (MLP). Cơ chế Self-Attention cho phép mỗi patch trong ảnh "nhìn thấy" và tương tác với tất cả các patch khác, bất kể khoảng cách không gian, giúp nắm bắt ngữ cảnh toàn cục của khối u não.
+
+Đầu ra của lớp thứ $l$ trong Transformer được tính toán như sau:
+\begin{align}
+\mathbf{z}'_l &= \text{MSA}(\text{LN}(\mathbf{z}_{l-1})) + \mathbf{z}_{l-1} \\
+\mathbf{z}_l &= \text{MLP}(\text{LN}(\mathbf{z}'_l)) + \mathbf{z}'_l
+\end{align}
+trong đó $\text{LN}(\cdot)$ là lớp chuẩn hóa (Layer Normalization), và $\mathbf{z}_L$ là biểu diễn đặc trưng đầu ra sau $L$ lớp Transformer.
+
+\subsubsection{Cascaded Up-sampler (CUP) Decoder}
+Để thực hiện phân đoạn (vốn yêu cầu đầu ra có độ phân giải bằng ảnh gốc), TransUNet cần khôi phục kích thước không gian từ chuỗi vector $\mathbf{z}_L$. 
+
+Đầu tiên, chuỗi đầu ra của Transformer $\mathbf{z}_L \in \mathbb{R}^{N \times D}$ được định hình lại (reshape) thành feature map 2D có kích thước $\frac{H}{P} \times \frac{W}{P} \times D$. Sau đó, bộ giải mã CUP thực hiện các bước up-sampling xen kẽ với các lớp tích chập.
+
+Điểm quan trọng nhất là việc sử dụng \textbf{Skip-connections lai}: TransUNet kết hợp đặc trưng ngữ nghĩa mức cao (từ Transformer) với đặc trưng không gian mức thấp (từ các tầng trung gian của CNN encoder ban đầu). Điều này giúp khôi phục các chi tiết biên của khối u tốt hơn so với việc chỉ up-sampling đơn thuần. Quá trình này được lặp lại cho đến khi đạt được độ phân giải gốc $H \times W$.
 
 \subsection{UNETR}
 
