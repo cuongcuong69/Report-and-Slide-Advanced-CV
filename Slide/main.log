@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.12.13)  7 JAN 2026 11:10
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.12.13)  7 JAN 2026 12:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2487,7 +2487,7 @@ Package microtype Warning: I cannot find a protrusion list for font
 
 pdfTeX warning: pdflatex.exe (file ./images/Background_mo_dau.pdf): PDF inclusi
 on: found PDF version <1.7>, but at most version <1.5> allowed
-<images/Background_mo_dau.pdf, id=106, 963.6pt x 542.025pt>
+<images/Background_mo_dau.pdf, id=110, 963.6pt x 542.025pt>
 File: images/Background_mo_dau.pdf Graphic file (type pdf)
 <use images/Background_mo_dau.pdf>
 Package pdftex.def Info: images/Background_mo_dau.pdf  used on input line 109.
@@ -2505,7 +2505,7 @@ Package microtype Warning: I cannot find a protrusion list for font
 
 pdfTeX warning: pdflatex.exe (file ./images/Background_frame.pdf): PDF inclusio
 n: found PDF version <1.7>, but at most version <1.5> allowed
-<images/Background_frame.pdf, id=166, 963.6pt x 542.025pt>
+<images/Background_frame.pdf, id=171, 963.6pt x 542.025pt>
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
 Package pdftex.def Info: images/Background_frame.pdf  used on input line 118.
@@ -2533,7 +2533,7 @@ Package microtype Warning: I cannot find a protrusion list for font
 (microtype)                `T5/cmss/bx/n/10'. Switching off
 (microtype)                protrusion for this font on input line 135.
 
-<images/HGG vs LGG1.png, id=216, 777.65532pt x 408.77719pt>
+<images/HGG vs LGG1.png, id=222, 777.65532pt x 408.77719pt>
 File: images/HGG vs LGG1.png Graphic file (type png)
 <use images/HGG vs LGG1.png>
 Package pdftex.def Info: images/HGG vs LGG1.png  used on input line 135.
@@ -2549,7 +2549,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 135.
 [3
 
  <./images/HGG vs LGG1.png>]
-<images/MRI đa chuỗi.png, id=248, 861.2175pt x 794.97pt>
+<images/MRI đa chuỗi.png, id=254, 861.2175pt x 794.97pt>
 File: images/MRI đa chuỗi.png Graphic file (type png)
 <use images/MRI đa chuỗi.png>
 Package pdftex.def Info: images/MRI đa chuỗi.png  used on input line 174.
@@ -2606,7 +2606,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 229.
  [9
 
 ]
-<images/Nhóm HGG.png, id=430, 1576.38937pt x 610.53094pt>
+<images/Nhóm HGG.png, id=437, 1576.38937pt x 610.53094pt>
 File: images/Nhóm HGG.png Graphic file (type png)
 <use images/Nhóm HGG.png>
 Package pdftex.def Info: images/Nhóm HGG.png  used on input line 237.
@@ -2618,7 +2618,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 237.
  [10
 
  <./images/Nhóm HGG.png>]
-<images/Nhóm LGG.png, id=460, 1711.89563pt x 660.21657pt>
+<images/Nhóm LGG.png, id=467, 1711.89563pt x 660.21657pt>
 File: images/Nhóm LGG.png Graphic file (type png)
 <use images/Nhóm LGG.png>
 Package pdftex.def Info: images/Nhóm LGG.png  used on input line 245.
@@ -2630,7 +2630,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 245.
  [11
 
  <./images/Nhóm LGG.png>]
-<images/So sánh HGG vs LGG.png, id=490, 1711.89563pt x 712.16063pt>
+<images/So sánh HGG vs LGG.png, id=497, 1711.89563pt x 712.16063pt>
 File: images/So sánh HGG vs LGG.png Graphic file (type png)
 <use images/So sánh HGG vs LGG.png>
 Package pdftex.def Info: images/So sánh HGG vs LGG.png  used on input line 255
@@ -2644,7 +2644,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 255.
 [12
 
  <./images/So sánh HGG vs LGG.png>]
-<images/Tương quan giữa các modality trong vùng khối u.png, id=520, 731
+<images/Tương quan giữa các modality trong vùng khối u.png, id=527, 731
 .73375pt x 651.93562pt>
 File: images/Tương quan giữa các modality trong vùng khối u.png Graphic
  file (type png)
@@ -2659,7 +2659,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 287.
  [13
 
  <./images/Tương quan giữa các modality trong vùng khối u.png>]
-<images/Phân chia dữ liệu.png, id=550, 605.26125pt x 252.945pt>
+<images/Phân chia dữ liệu.png, id=557, 605.26125pt x 252.945pt>
 File: images/Phân chia dữ liệu.png Graphic file (type png)
 <use images/Phân chia dữ liệu.png>
 Package pdftex.def Info: images/Phân chia dữ liệu.png  used on input line 
@@ -2680,7 +2680,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 305.
  [15
 
 ]
-<images/Quy trình tổng quan.png, id=620, 1712.64844pt x 264.99pt>
+<images/Quy trình tổng quan.png, id=628, 1712.64844pt x 264.99pt>
 File: images/Quy trình tổng quan.png Graphic file (type png)
 <use images/Quy trình tổng quan.png>
 Package pdftex.def Info: images/Quy trình tổng quan.png  used on input line 
@@ -2693,7 +2693,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 313.
  [16
 
  <./images/Quy trình tổng quan.png>]
-<images/Kiến trúc UNet1.png, id=649, 1302.36563pt x 612.78937pt>
+<images/Kiến trúc UNet1.png, id=657, 1302.36563pt x 612.78937pt>
 File: images/Kiến trúc UNet1.png Graphic file (type png)
 <use images/Kiến trúc UNet1.png>
 Package pdftex.def Info: images/Kiến trúc UNet1.png  used on input line 342.
@@ -2727,7 +2727,7 @@ Package microtype Warning: I cannot find a protrusion list for font
 (microtype)                `T5/cmss/m/sl/10.95'. Switching off
 (microtype)                protrusion for this font on input line 376.
 
-<images/Kiến trúc UNet++3.png, id=706, 780.66656pt x 743.77875pt>
+<images/Kiến trúc UNet++3.png, id=714, 780.66656pt x 743.77875pt>
 File: images/Kiến trúc UNet++3.png Graphic file (type png)
 <use images/Kiến trúc UNet++3.png>
 Package pdftex.def Info: images/Kiến trúc UNet++3.png  used on input line 37
@@ -2744,7 +2744,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 376.
 [19
 
  <./images/Kiến trúc UNet++3.png>]
-<images/Deep supervision trong UNet++.png, id=737, 693.34032pt x 1037.37563pt>
+<images/Deep supervision trong UNet++.png, id=745, 693.34032pt x 1037.37563pt>
 File: images/Deep supervision trong UNet++.png Graphic file (type png)
 <use images/Deep supervision trong UNet++.png>
 Package pdftex.def Info: images/Deep supervision trong UNet++.png  used on inpu
@@ -2764,7 +2764,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 418.
  [21
 
 ]
-<images/Kiến trúc VNet1.png, id=794, 638.385pt x 453.3738pt>
+<images/Kiến trúc VNet1.png, id=802, 638.385pt x 453.3738pt>
 File: images/Kiến trúc VNet1.png Graphic file (type png)
 <use images/Kiến trúc VNet1.png>
 Package pdftex.def Info: images/Kiến trúc VNet1.png  used on input line 449.
@@ -2786,7 +2786,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 449.
 [22
 
  <./images/Kiến trúc VNet1.png>]
-<images/VNet-downsample.png, id=824, 1082.54437pt x 492.33937pt>
+<images/VNet-downsample.png, id=832, 1082.54437pt x 492.33937pt>
 File: images/VNet-downsample.png Graphic file (type png)
 <use images/VNet-downsample.png>
 Package pdftex.def Info: images/VNet-downsample.png  used on input line 465.
@@ -2798,7 +2798,7 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 465.
  [23
 
  <./images/VNet-downsample.png>]
-<images/VNet-upsample.png, id=853, 1047.16219pt x 493.845pt>
+<images/VNet-upsample.png, id=861, 1047.16219pt x 493.845pt>
 File: images/VNet-upsample.png Graphic file (type png)
 <use images/VNet-upsample.png>
 Package pdftex.def Info: images/VNet-upsample.png  used on input line 479.
@@ -2811,259 +2811,325 @@ Package pdftex.def Info: images/Background_frame.pdf  used on input line 479.
 [24
 
  <./images/VNet-upsample.png>]
-<images/Tổng quan kiến trúc Swin UNet3D.png, id=882, 830.35219pt x 616.553
-44pt>
-File: images/Tổng quan kiến trúc Swin UNet3D.png Graphic file (type png)
-<use images/Tổng quan kiến trúc Swin UNet3D.png>
-Package pdftex.def Info: images/Tổng quan kiến trúc Swin UNet3D.png  used 
-on input line 488.
-(pdftex.def)             Requested size: 260.00905pt x 193.0582pt.
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 488.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 485.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
  [25
 
- <./images/Tổng quan kiến trúc Swin UNet3D.png>]
-<images/Các module cốt lõi của Swin UNet3D.png, id=913, 1061.46562pt x 78
-8.9475pt>
-File: images/Các module cốt lõi của Swin UNet3D.png Graphic file (type pn
-g)
-<use images/Các module cốt lõi của Swin UNet3D.png>
-Package pdftex.def Info: images/Các module cốt lõi của Swin UNet3D.png  u
-sed on input line 495.
-(pdftex.def)             Requested size: 303.3395pt x 225.45428pt.
-
-Overfull \vbox (21.32674pt too high) detected at line 495
- []
-
+]
+<images/unetr_architect.png, id=919, 511.9125pt x 280.6485pt>
+File: images/unetr_architect.png Graphic file (type png)
+<use images/unetr_architect.png>
+Package pdftex.def Info: images/unetr_architect.png  used on input line 494.
+(pdftex.def)             Requested size: 346.67653pt x 190.05907pt.
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 495.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 494.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
-[26
+ [26
 
- <./images/Các module cốt lõi của Swin UNet3D.png>]
-<images/Window attention 3D.png, id=942, 725.71124pt x 602.25pt>
-File: images/Window attention 3D.png Graphic file (type png)
-<use images/Window attention 3D.png>
-Package pdftex.def Info: images/Window attention 3D.png  used on input line 504
-.
-(pdftex.def)             Requested size: 260.00905pt x 215.7806pt.
-
-Overfull \vbox (11.65305pt too high) detected at line 504
- []
-
+ <./images/unetr_architect.png>]
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 504.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 502.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+
 [27
 
- <./images/Window attention 3D.png>] (main.toc)
+]
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 507.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 510.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
  [28
 
 ]
-<images/HD.png, id=1012, 369.63094pt x 274.77657pt>
-File: images/HD.png Graphic file (type png)
-<use images/HD.png>
-Package pdftex.def Info: images/HD.png  used on input line 524.
-(pdftex.def)             Requested size: 123.43443pt x 91.75827pt.
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 524.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 518.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
  [29
 
+]
+<images/Tổng quan kiến trúc Swin UNet3D.png, id=1028, 830.35219pt x 616.55
+344pt>
+File: images/Tổng quan kiến trúc Swin UNet3D.png Graphic file (type png)
+<use images/Tổng quan kiến trúc Swin UNet3D.png>
+Package pdftex.def Info: images/Tổng quan kiến trúc Swin UNet3D.png  used 
+on input line 528.
+(pdftex.def)             Requested size: 260.00905pt x 193.0582pt.
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 528.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [30
+
+ <./images/Tổng quan kiến trúc Swin UNet3D.png>]
+<images/Các module cốt lõi của Swin UNet3D.png, id=1058, 1061.46562pt x 7
+88.9475pt>
+File: images/Các module cốt lõi của Swin UNet3D.png Graphic file (type pn
+g)
+<use images/Các module cốt lõi của Swin UNet3D.png>
+Package pdftex.def Info: images/Các module cốt lõi của Swin UNet3D.png  u
+sed on input line 535.
+(pdftex.def)             Requested size: 303.3395pt x 225.45428pt.
+
+Overfull \vbox (21.32674pt too high) detected at line 535
+ []
+
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 535.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+[31
+
+ <./images/Các module cốt lõi của Swin UNet3D.png>]
+<images/Window attention 3D.png, id=1088, 725.71124pt x 602.25pt>
+File: images/Window attention 3D.png Graphic file (type png)
+<use images/Window attention 3D.png>
+Package pdftex.def Info: images/Window attention 3D.png  used on input line 544
+.
+(pdftex.def)             Requested size: 260.00905pt x 215.7806pt.
+
+Overfull \vbox (11.65305pt too high) detected at line 544
+ []
+
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 544.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+[32
+
+ <./images/Window attention 3D.png>] (main.toc)
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 547.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [33
+
+]
+<images/HD.png, id=1159, 369.63094pt x 274.77657pt>
+File: images/HD.png Graphic file (type png)
+<use images/HD.png>
+Package pdftex.def Info: images/HD.png  used on input line 564.
+(pdftex.def)             Requested size: 123.43443pt x 91.75827pt.
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 564.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [34
+
  <./images/HD.png>]
-<images/Toàn bộ thể tích và 1 patch của ca chụp 101.png, id=1042, 32
+<images/Toàn bộ thể tích và 1 patch của ca chụp 101.png, id=1189, 32
 6.72063pt x 578.16pt>
 File: images/Toàn bộ thể tích và 1 patch của ca chụp 101.png Graphic
  file (type png)
 <use images/Toàn bộ thể tích và 1 patch của ca chụp 101.png>
 Package pdftex.def Info: images/Toàn bộ thể tích và 1 patch của ca ch�
-��p 101.png  used on input line 554.
+��p 101.png  used on input line 594.
 (pdftex.def)             Requested size: 104.00163pt x 184.03574pt.
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 554.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 594.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
 
-[30
+[35
 
  <./images/Toàn bộ thể tích và 1 patch của ca chụp 101.png>]
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 564.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 604.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
 
-[31
+[36
 
 ]
-<images/Learning curbs VNet patch Diceloss.png, id=1099, 1647.15375pt x 1011.02
+<images/Learning curbs VNet patch Diceloss.png, id=1245, 1647.15375pt x 1011.02
 719pt>
 File: images/Learning curbs VNet patch Diceloss.png Graphic file (type png)
 <use images/Learning curbs VNet patch Diceloss.png>
 Package pdftex.def Info: images/Learning curbs VNet patch Diceloss.png  used on
- input line 572.
+ input line 612.
 (pdftex.def)             Requested size: 346.67653pt x 212.78479pt.
 
-Overfull \vbox (8.65724pt too high) detected at line 572
+Overfull \vbox (8.65724pt too high) detected at line 612
  []
 
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 572.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 612.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
-[32
+[37
 
  <./images/Learning curbs VNet patch Diceloss.png>] (main.toc)
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 574.
-(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [33
-
-]
-File: images/Background_frame.pdf Graphic file (type pdf)
-<use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 595.
-(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [34
-
-]
-<images/Visualize kết quả UNet++.png, id=1196, 889.8846pt x 337.26pt>
-File: images/Visualize kết quả UNet++.png Graphic file (type png)
-<use images/Visualize kết quả UNet++.png>
-Package pdftex.def Info: images/Visualize kết quả UNet++.png  used on input
- line 622.
-(pdftex.def)             Requested size: 303.3395pt x 114.9602pt.
-
-Overfull \vbox (2.44972pt too high) detected at line 622
- []
-
-File: images/Background_frame.pdf Graphic file (type pdf)
-<use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 622.
-(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
-[35
-
- <./images/Visualize kết quả UNet++.png>]
-File: images/Background_frame.pdf Graphic file (type pdf)
-<use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 666.
-(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [36
-
-]
-File: images/Background_frame.pdf Graphic file (type pdf)
-<use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 710.
-(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [37
-
-]
-File: images/Background_frame.pdf Graphic file (type pdf)
-<use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 734.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 614.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
  [38
 
 ]
-<images/Toàn bộ kết quả thử nghiệm với VNet.png, id=1308, 1838.368
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 635.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [39
+
+]
+<images/Visualize kết quả UNet++.png, id=1344, 889.8846pt x 337.26pt>
+File: images/Visualize kết quả UNet++.png Graphic file (type png)
+<use images/Visualize kết quả UNet++.png>
+Package pdftex.def Info: images/Visualize kết quả UNet++.png  used on input
+ line 662.
+(pdftex.def)             Requested size: 303.3395pt x 114.9602pt.
+
+Overfull \vbox (2.44972pt too high) detected at line 662
+ []
+
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 662.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+[40
+
+ <./images/Visualize kết quả UNet++.png>]
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 706.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [41
+
+]
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 750.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [42
+
+]
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 774.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [43
+
+]
+<images/Toàn bộ kết quả thử nghiệm với VNet.png, id=1456, 1838.368
 12pt x 612.03656pt>
 File: images/Toàn bộ kết quả thử nghiệm với VNet.png Graphic file 
 (type png)
 <use images/Toàn bộ kết quả thử nghiệm với VNet.png>
 Package pdftex.def Info: images/Toàn bộ kết quả thử nghiệm với VNe
-t.png  used on input line 742.
+t.png  used on input line 782.
 (pdftex.def)             Requested size: 433.34402pt x 144.26753pt.
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 742.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 782.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [39
+ [44
 
  <./images/Toàn bộ kết quả thử nghiệm với VNet.png>]
-<images/Kết quả VNet.png, id=1338, 1532.72626pt x 828.09375pt>
+<images/Kết quả VNet.png, id=1486, 1532.72626pt x 828.09375pt>
 File: images/Kết quả VNet.png Graphic file (type png)
 <use images/Kết quả VNet.png>
-Package pdftex.def Info: images/Kết quả VNet.png  used on input line 750.
+Package pdftex.def Info: images/Kết quả VNet.png  used on input line 790.
 (pdftex.def)             Requested size: 346.67653pt x 187.29863pt.
 
-Overfull \vbox (10.1882pt too high) detected at line 750
+Overfull \vbox (10.1882pt too high) detected at line 790
  []
 
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 750.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 790.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
-[40
+[45
 
  <./images/Kết quả VNet.png>]
-<images/Kết quả VNet4.png, id=1368, 1741.25531pt x 984.67876pt>
+<images/Kết quả VNet4.png, id=1516, 1741.25531pt x 984.67876pt>
 File: images/Kết quả VNet4.png Graphic file (type png)
 <use images/Kết quả VNet4.png>
-Package pdftex.def Info: images/Kết quả VNet4.png  used on input line 758.
+Package pdftex.def Info: images/Kết quả VNet4.png  used on input line 798.
 (pdftex.def)             Requested size: 325.00801pt x 183.78542pt.
 
-Overfull \vbox (6.67499pt too high) detected at line 758
+Overfull \vbox (6.67499pt too high) detected at line 798
  []
 
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 758.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 798.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
-[41
+[46
 
  <./images/Kết quả VNet4.png>]
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 780.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 819.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [42
+ [47
+
+]
+<images/Kết quả phân đoạn của UNETR trên lát cắt của ca chụp 
+91.png, id=1573, 1541.76pt x 780.66656pt>
+File: images/Kết quả phân đoạn của UNETR trên lát cắt của ca ch
+ụp 91.png Graphic file (type png)
+<use images/Kết quả phân đoạn của UNETR trên lát cắt của ca ch�
+��p 91.png>
+Package pdftex.def Info: images/Kết quả phân đoạn của UNETR trên lá
+t cắt của ca chụp 91.png  used on input line 828.
+(pdftex.def)             Requested size: 346.67653pt x 175.53519pt.
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 828.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [48
+
+ <./images/Kết quả phân đoạn của UNETR trên lát cắt của ca ch�
+�p 91.png>]
+File: images/Background_frame.pdf Graphic file (type pdf)
+<use images/Background_frame.pdf>
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 852.
+(pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
+ [49
 
 ]
 <images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ.png,
- id=1425, 1217.2978pt x 627.84563pt>
+ id=1631, 1217.2978pt x 627.84563pt>
 File: images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ
 .png Graphic file (type png)
 <use images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ.
 png>
 Package pdftex.def Info: images/Trường hợp Swin UNet3D dự đoán tốt v
-à dự đoán tệ.png  used on input line 787.
+à dự đoán tệ.png  used on input line 859.
 (pdftex.def)             Requested size: 390.00697pt x 201.1542pt.
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 787.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 859.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [43
+ [50
 
  <./images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ.p
 ng>]
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 810.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 882.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [44
+ [51
 
 ]
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 833.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 905.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [45
+
+[52
 
 ]
 File: images/Background_frame.pdf Graphic file (type pdf)
 <use images/Background_frame.pdf>
-Package pdftex.def Info: images/Background_frame.pdf  used on input line 856.
+Package pdftex.def Info: images/Background_frame.pdf  used on input line 928.
 (pdftex.def)             Requested size: 455.2446pt x 256.08334pt.
- [46
+ [53
 
 ]
 \tf@nav=\write9
@@ -3081,17 +3147,17 @@ LaTeX2e <2025-11-01>
 L3 programming layer <2025-11-06>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: E6D1810364F965CB83410E59B91C932D;1828.
+(rerunfilecheck)             Checksum: 435B4E593E72F698D74DE3322A6D840F;1912.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 71541 strings out of 467871
- 1709761 string characters out of 5418375
- 2734017 words of memory out of 5000000
- 99097 multiletter control sequences out of 15000+600000
- 651049 words of font info for 134 fonts, out of 8000000 for 9000
+ 71618 strings out of 467871
+ 1712026 string characters out of 5418375
+ 2734212 words of memory out of 5000000
+ 99145 multiletter control sequences out of 15000+600000
+ 651453 words of font info for 140 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,15n,123p,1869b,1050s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/ADMIN/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
@@ -3106,9 +3172,9 @@ ams/MiKTeX/fonts/type1/vntex/vnr/vnss8.pfb><C:/Users/ADMIN/AppData/Local/Progra
 ms/MiKTeX/fonts/type1/vntex/vnr/vnssbx10.pfb><C:/Users/ADMIN/AppData/Local/Prog
 rams/MiKTeX/fonts/type1/vntex/vnr/vnssi10.pfb><C:/Users/ADMIN/AppData/Local/Pro
 grams/MiKTeX/fonts/type1/vntex/vnr/vntt10.pfb>
-Output written on main.pdf (46 pages, 8296807 bytes).
+Output written on main.pdf (53 pages, 9361258 bytes).
 PDF statistics:
- 1611 PDF objects out of 1728 (max. 8388607)
- 132 named destinations out of 1000 (max. 500000)
- 37328 words of extra memory for PDF output out of 42996 (max. 10000000)
+ 1820 PDF objects out of 2073 (max. 8388607)
+ 149 named destinations out of 1000 (max. 500000)
+ 37346 words of extra memory for PDF output out of 42996 (max. 10000000)
 

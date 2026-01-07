@@ -478,6 +478,46 @@ Nhánh decoder của VNet khôi phục kích thước không gian bằng:
 \end{figure}
 \end{frame}
 
+
+\subsection{UNETR}
+\begin{frame}{UNETR}
+UNETR (2021) là kiến trúc lai giữa Transformer và CNN dành cho phân đoạn ảnh y tế 3D. Để khắc phục hạn chế về vùng tiếp nhận cục bộ của các mạng tích chập truyền thống, UNETR sử dụng encoder Transformer để mã hóa ảnh dưới dạng chuỗi patch 3D, giúp học hiệu quả các phụ thuộc dài hạn và ngữ cảnh toàn cục. Các biểu diễn này được kết hợp với một decoder CNN thông qua hệ thống skip connection đa độ phân giải, giúp mô hình vừa nắm bắt thông tin diện rộng, vừa duy trì được các chi tiết không gian cục bộ để dự đoán kết quả phân đoạn chính xác.
+\end{frame}
+
+
+\begin{frame}{Kiến trúc UNETR}    
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/unetr_architect}
+\label{fig:kien-truc-unetr}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Đầu vào và Embedding}
+  \begin{itemize}
+    \item UNETR sử dụng kiến trúc encoder--decoder dạng thu hẹp--mở rộng, lấy cảm hứng từ U-Net.
+    \item Encoder dựa trên Transformer nhằm học các đặc trưng toàn cục từ dữ liệu ảnh y tế 3D.
+    \item Decoder thực hiện khôi phục độ phân giải và tạo bản đồ phân đoạn, trong đó hai nhánh được kết nối với nhau thông qua skip connection.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Encoder Transformer \& Skip Connection}
+  \begin{itemize}
+    \item Encoder bao gồm nhiều khối Transformer với cơ chế multi-head self-attention và các lớp MLP.
+    \item Layer normalization và residual connection được sử dụng nhằm ổn định và cải thiện quá trình học.
+    \item Các đặc trưng trích xuất từ các tầng trung gian được reshape thành tensor 3D và được truyền sang decoder thông qua skip connection.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Decoder và Đầu ra}
+  \begin{itemize}
+    \item Decoder bắt đầu từ nút thắt cổ chai (\textit{bottleneck}), tương ứng với đầu ra Transformer cuối cùng.
+    \item Các đặc trưng được upsampling bằng các lớp deconvolution và được kết hợp với các đặc trưng từ encoder thông qua skip connection.
+    \item Cuối cùng, một lớp tích chập $1 \times 1 \times 1$ kết hợp với hàm softmax tạo ra bản đồ phân đoạn theo từng voxel.
+\end{itemize}
+\end{frame}
+
+
 \subsection{Swin UNet3D}
 \begin{frame}{Swin UNet3D}
 \begin{figure}[H]
@@ -756,6 +796,38 @@ $\Rightarrow$ VNet huấn luyện trên các patch 3D sử dụng \magenta{DiceL
 \label{fig:ket-qua-vnet4}
 \end{figure}
 \end{frame}
+
+\begin{frame}{Kết quả UNETR}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{
+	    >{\raggedright\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+		}
+		\hline
+		\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+		\hline
+    WT & 0.8729 & 0.7887 & 3.4713 & 10.5030 \\
+    TC & 0.7819 & 0.6777 & 5.2696 & 12.7303 \\
+    ET & 0.6869 & 0.5788 & 4.2527 & 12.4837 \\
+		\hline
+	\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{Kết quả UNETR}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{"images/Kết quả phân đoạn của UNETR trên lát cắt của ca chụp 91"}
+\caption{Kết quả phân đoạn của UNETR trên lát cắt thứ 88 của ca chụp 91}
+\label{fig:ket-qua-phan-oan-cua-unetr-tren-lat-cat-cua-ca-chup-91}
+\end{figure}
+\end{frame}
+
+
 
 
 \begin{frame}{Kết quả Swin UNet3D}

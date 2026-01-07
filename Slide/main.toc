@@ -7,8 +7,9 @@
 \beamer@subsectionintoc {3}{2}{UNet}{17}{0}{3}
 \beamer@subsectionintoc {3}{3}{UNet++}{18}{0}{3}
 \beamer@subsectionintoc {3}{4}{VNet}{21}{0}{3}
-\beamer@subsectionintoc {3}{5}{Swin UNet3D}{25}{0}{3}
-\beamer@sectionintoc {4}{Thực nghiệm}{28}{0}{4}
-\beamer@subsectionintoc {4}{1}{Các độ đo đánh giá}{29}{0}{4}
-\beamer@subsectionintoc {4}{2}{Các thử nghiệm thực hiện}{30}{0}{4}
-\beamer@sectionintoc {5}{Kết quả}{33}{0}{5}
+\beamer@subsectionintoc {3}{5}{UNETR}{25}{0}{3}
+\beamer@subsectionintoc {3}{6}{Swin UNet3D}{30}{0}{3}
+\beamer@sectionintoc {4}{Thực nghiệm}{33}{0}{4}
+\beamer@subsectionintoc {4}{1}{Các độ đo đánh giá}{34}{0}{4}
+\beamer@subsectionintoc {4}{2}{Các thử nghiệm thực hiện}{35}{0}{4}
+\beamer@sectionintoc {5}{Kết quả}{38}{0}{5}
