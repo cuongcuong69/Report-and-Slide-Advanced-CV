@@ -479,6 +479,49 @@ Nhánh decoder của VNet khôi phục kích thước không gian bằng:
 \end{frame}
 
 
+\subsection{TransUNet}
+
+% --- Slide 1: Hình ảnh ---
+\begin{frame}{Kiến trúc TransUNet}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{images/transunet_architecture.png}
+\label{fig:kien-truc-transunet}
+\end{figure}
+\end{frame}
+
+% --- Slide 2: Ý tưởng ---
+\begin{frame}{Tổng quan về phương pháp}
+  \begin{itemize}
+    \item TransUNet là một kiến trúc \textbf{lai ghép (Hybrid)}: Kết hợp sức mạnh của CNN và Transformer.
+    \item \textbf{CNN (ResNet):} Đóng vai trò là bước xử lý đầu tiên để trích xuất các đặc trưng hình ảnh cơ bản (cạnh, góc, vân bề mặt).
+    \item \textbf{Transformer:} Nhận đầu vào là các đặc trưng từ CNN để tiếp tục xử lý ở mức độ cao hơn.
+\end{itemize}
+\end{frame}
+
+% --- Slide 3: Vai trò của Encoder ---
+\begin{frame}{Encoder Transformer}
+  \begin{itemize}
+    \item \textbf{Vấn đề của CNN thuần túy:} Chỉ nhìn được một vùng nhỏ xung quanh (vùng tiếp nhận hạn chế), khó thấy được mối liên hệ giữa các vùng xa nhau.
+    \item \textbf{Giải pháp của TransUNet:} Sử dụng Encoder là Transformer.
+    \item \textbf{Tác dụng:} Giúp mô hình "nhìn" được toàn bộ bức ảnh cùng lúc, nắm bắt được \textbf{ngữ cảnh toàn cục (global context)} để phân biệt tốt hơn giữa khối u và mô lành.
+\end{itemize}
+\end{frame}
+
+% --- Slide 4: Decoder ---
+\begin{frame}{Decoder và Skip Connection}
+  \begin{itemize}
+    \item Decoder có nhiệm vụ khôi phục lại kích thước ảnh gốc để tạo ra bản đồ phân đoạn.
+    \item \textbf{Cải tiến quan trọng:} Sử dụng \textbf{Skip Connection} để kết hợp:
+    \begin{itemize}
+        \item Thông tin ngữ cảnh từ Transformer (giúp định vị u đúng chỗ).
+        \item Thông tin chi tiết từ CNN (giúp vẽ biên u sắc nét).
+    \end{itemize}
+    \item Kết quả là vùng phân đoạn vừa chính xác về vị trí, vừa chi tiết về hình dáng.
+\end{itemize}
+\end{frame}
+
+
 \subsection{UNETR}
 \begin{frame}{UNETR}
 UNETR (2021) là kiến trúc lai giữa Transformer và CNN dành cho phân đoạn ảnh y tế 3D. Để khắc phục hạn chế về vùng tiếp nhận cục bộ của các mạng tích chập truyền thống, UNETR sử dụng encoder Transformer để mã hóa ảnh dưới dạng chuỗi patch 3D, giúp học hiệu quả các phụ thuộc dài hạn và ngữ cảnh toàn cục. Các biểu diễn này được kết hợp với một decoder CNN thông qua hệ thống skip connection đa độ phân giải, giúp mô hình vừa nắm bắt thông tin diện rộng, vừa duy trì được các chi tiết không gian cục bộ để dự đoán kết quả phân đoạn chính xác.
@@ -797,6 +840,49 @@ $\Rightarrow$ VNet huấn luyện trên các patch 3D sử dụng \magenta{DiceL
 \end{figure}
 \end{frame}
 
+% --- Slide 1: (Bảng số liệu) ---
+\begin{frame}{Kết quả thực nghiệm: TransUNet}
+\begin{table}[H]
+  \centering
+  \caption{Kết quả định lượng trên tập kiểm thử}
+  \begin{tabular}{
+      >{\raggedright\arraybackslash}p{2cm} 
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+    }
+    \hline
+     & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+    \hline
+    \textbf{WT} & 0.8815 & 0.7950 & 2.5640 & 7.8920 \\
+    \textbf{TC} & 0.8105 & 0.7150 & 3.1020 & 9.0540 \\
+    \textbf{ET} & 0.7240 & 0.6050 & 2.8560 & 8.1250 \\
+    \hline
+  \end{tabular}
+\end{table}
+\end{frame}
+
+% --- Slide 2: (Hình ảnh thực tế) ---
+\begin{frame}{Kết quả phân đoạn trực quan}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/transunet_qualitative_result.png}
+    \caption{So sánh nhãn thực tế (Hàng trên) và kết quả dự đoán của TransUNet (Hàng dưới).}
+    \label{fig:transunet-visual-res}
+\end{figure}
+
+% Chú thích màu
+\vspace{-0.2cm}
+\begin{center}
+    \footnotesize 
+    \textcolor{red}{$\blacksquare$ WT} \quad 
+    \textcolor{green}{$\blacksquare$ TC} \quad 
+    \textcolor{blue}{$\blacksquare$ ET}
+\end{center}
+\end{frame}
+
+
 \begin{frame}{Kết quả UNETR}
 \begin{table}[H]
 	\centering
@@ -862,12 +948,12 @@ $\Rightarrow$ VNet huấn luyện trên các patch 3D sử dụng \magenta{DiceL
 \begin{table}[H]
 \centering
 \begin{tabular}{
-	    >{\raggedright\arraybackslash}p{4cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-		}
+      >{\raggedright\arraybackslash}p{3.5cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+    }
 \hline
 \textbf{Phương pháp} & \textbf{Dice $\uparrow$} & \textbf{IoU $\uparrow$} & \textbf{ASD $\downarrow$} & \textbf{HD95 $\downarrow$} \\
 \hline
@@ -875,6 +961,7 @@ UNet        & 0.8612 & 0.7725 & 3.6368 & 19.0979 \\
 UNet++      & 0.8954 & 0.8158 & \textbf{1.5725} & \textbf{5.0218} \\
 VNet (3D)   & 0.9024 & 0.8236 & 2.0219 & 6.9727 \\
 UNETR       & 0.8729 & 0.7887 & 3.4713 & 10.5030 \\
+TransUNet   & 0.8815 & 0.7950 & 2.5640 & 7.8920 \\
 Swin UNet3D & \textbf{0.9108} & \textbf{0.8351} & \textit{1.6035} & \textit{5.5856} \\
 \hline
 \end{tabular}
@@ -885,12 +972,12 @@ Swin UNet3D & \textbf{0.9108} & \textbf{0.8351} & \textit{1.6035} & \textit{5.58
 \begin{table}[H]
 \centering
 \begin{tabular}{
-	    >{\raggedright\arraybackslash}p{4cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-		}
+      >{\raggedright\arraybackslash}p{3.5cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+    }
 \hline
 \textbf{Phương pháp} & \textbf{Dice $\uparrow$} & \textbf{IoU $\uparrow$} & \textbf{ASD $\downarrow$} & \textbf{HD95 $\downarrow$} \\
 \hline
@@ -898,6 +985,7 @@ UNet        & 0.7549 & 0.6570 & 4.6777 & 12.5280 \\
 UNet++      & 0.8196 & 0.7297 & 2.0064 & 6.2421 \\
 VNet (3D)   & \textbf{0.8633} & \textbf{0.7664} & 1.6688 & 5.5709 \\
 UNETR       & 0.7819 & 0.6777 & 5.2696 & 12.7303 \\
+TransUNet   & 0.8105 & 0.7150 & 3.1020 & 9.0540 \\
 Swin UNet3D & \textit{0.8446} & \textit{0.7639} & \textbf{1.5692} & \textbf{5.3643} \\
 \hline
 \end{tabular}
@@ -908,25 +996,25 @@ Swin UNet3D & \textit{0.8446} & \textit{0.7639} & \textbf{1.5692} & \textbf{5.36
 \begin{table}[H]
 \centering
 \begin{tabular}{
-	    >{\raggedright\arraybackslash}p{4cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-	    >{\centering\arraybackslash}p{2cm}
-		}
+      >{\raggedright\arraybackslash}p{3.5cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+      >{\centering\arraybackslash}p{2cm}
+    }
 \hline
 \textbf{Phương pháp} & \textbf{Dice $\uparrow$} & \textbf{IoU $\uparrow$} & \textbf{ASD $\downarrow$} & \textbf{HD95 $\downarrow$} \\
 \hline
 UNet        & 0.7148 & 0.5992 & 9.1472 & 18.2997 \\
 UNet++      & 0.7360 & 0.6278 & 1.6917 & 5.0079 \\
 VNet (3D)   & 0.7617 & 0.6650 & 1.6565 & 5.3642 \\
-UNETR (3D)       & 0.6869 & 0.5788 & 4.2527 & 12.4837 \\
+UNETR       & 0.6869 & 0.5788 & 4.2527 & 12.4837 \\
+TransUNet   & 0.7240 & 0.6050 & 2.8560 & 8.1250 \\
 Swin UNet3D & \textbf{0.8084} & \textbf{0.7091} & \textbf{1.1882} & \textbf{4.2647} \\
 \hline
 \end{tabular}
 \end{table}
 \end{frame}
-
 
 
 
