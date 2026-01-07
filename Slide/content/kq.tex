@@ -1,0 +1,129 @@
+\section{Thực nghiệm và kết quả}
+\subsection{So sánh pipeline ba bước và huấn luyện trực tiếp}
+
+\begin{frame}{So sánh độ chính xác giữa hai phương pháp}
+\begin{columns}
+    \begin{column}{0.55\textwidth}
+        \textbf{\faVial~Đánh giá theo Dice Score (DSC):}
+        \begin{itemize}
+            \item[\faArrowRight] Huấn luyện trực tiếp:
+            \begin{itemize}
+                \item Dice trung bình: \textbf{0.746}
+                \item Mất ổn định trên lát cắt không rõ ràng
+            \end{itemize}
+            \item[\faArrowRight] Pipeline 3 bước:
+            \begin{itemize}
+                \item Dice trung bình: \textbf{0.812}
+                \item Ổn định hơn, bỏ qua lát cắt không chứa phổi
+            \end{itemize}
+        \end{itemize}
+
+        \vspace{0.5em}
+        \textbf{\faCheckDouble~Kết luận:} Pipeline 3 bước cải thiện kết quả phân đoạn rõ rệt
+    \end{column}
+    \begin{column}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{anh/ss2pp.jpg}
+        \vspace{0.6em}
+        
+    \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Ảnh hưởng của ngưỡng phân loại lát cắt u}
+\begin{itemize}
+    \item[\faSlidersH] Ngưỡng quyết định lát cắt có u ảnh hưởng đến chất lượng phân đoạn:
+\end{itemize}
+
+\vspace{1em}
+\begin{table}[]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Ngưỡng chọn lát cắt} & \textbf{Dice trung bình} \\ \hline
+0.3                          & 0.798                     \\ \hline
+0.5                          & \textbf{0.812}            \\ \hline
+0.7                          & 0.781                     \\ \hline
+\end{tabular}
+\end{table}
+
+\vspace{1em}
+\textbf{\faLightbulb~Nhận xét:} Ngưỡng quá thấp gây nhiễu (chọn cả lát không có u), ngưỡng quá cao gây bỏ sót → cần chọn tối ưu
+\end{frame}
+
+\begin{frame}{Tăng cường suy luận bằng Test-Time Augmentation (TTA)}
+\begin{itemize}
+    \item[\faSync] Áp dụng kỹ thuật TTA: xoay, lật ảnh ở bước suy luận
+    \item[\faPlusSquare] Tổng hợp nhiều dự đoán để nâng độ chính xác
+\end{itemize}
+
+\vspace{1em}
+\textbf{Hiệu quả:}
+\begin{itemize}
+    \item Dice tăng từ \textbf{0.812 → 0.826} khi kết hợp TTA
+    \item Giảm nhiễu và tăng ổn định kết quả
+\end{itemize}
+
+\vspace{1em}
+\begin{flushright}
+\scriptsize{\faChartLine~TTA là bước đơn giản nhưng hiệu quả cao trong suy luận}
+\end{flushright}
+\end{frame}
+
+\begin{frame}{Ví dụ kết quả phân đoạn}
+\begin{columns}
+    \begin{column}{0.5\textwidth}
+        \includegraphics[width=\linewidth]{images/result_direct.png}
+        \centering
+        {\tiny Huấn luyện trực tiếp: bỏ sót phần u}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+        \includegraphics[width=\linewidth]{images/result_pipeline.png}
+        \centering
+        {\tiny Pipeline ba bước: phân đoạn rõ nét hơn}
+    \end{column}
+\end{columns}
+
+\vspace{1em}
+\begin{itemize}
+    \item[\faMicroscope] Pipeline cho kết quả chính xác hơn cả về hình dạng và kích thước
+    \item[\faEye] Đặc biệt hiệu quả ở các lát có u mờ, kích thước nhỏ
+\end{itemize}
+\end{frame}
+
+\begin{frame}{So sánh với các mô hình khác}
+
+\textbf{\faChartBar~So sánh định lượng:}
+
+\vspace{0.5em}
+Để đánh giá hiệu quả của pipeline đề xuất một cách toàn diện, chúng tôi tiến hành so sánh với các kết quả định lượng từ những nghiên cứu trước đã được công bố.
+
+\vspace{0.8em}
+\begin{itemize}
+    \item[\faBook] Bài báo \textbf{[1]}: Recurrent3D-DenseUNet đạt hệ số Dice cao nhất là \textbf{0.7228}, với \textbf{321 FP} và \textbf{331 FN}.
+    \item[\faBook] Bài báo \textbf{[2]}: Deeply Supervised MultiResUnet đạt Dice \textbf{0.8472}, \textbf{123 FP} và \textbf{343 FN}.
+    \item[\faTrophy] \textbf{Pipeline đề xuất} đạt \textbf{Dice 0.8672}, chỉ \textbf{168 FP} và \textbf{225 FN}.
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{\faCheckCircle~Nhận xét:} Pipeline ba bước của chúng tôi vượt trội về độ chính xác phân đoạn, đặc biệt giảm số lượng FN — yếu tố quan trọng giúp giảm nguy cơ bỏ sót khối u thật trong thực hành lâm sàng.
+
+\end{frame}
+
+\begin{frame}{Bảng so sánh kết quả với các phương pháp khác}
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Phương pháp} & \textbf{Dice} & \textbf{FP} & \textbf{FN} & \textbf{Shape of Input} \\
+\hline
+Recurrent3D-DenseUNet \cite{ref1} & 0.7228 & 321 & 331 & (8, 256, 256) \\
+\hline
+Deeply Supervised MultiResUnet \cite{ref2} & 0.8472 & 123 & 343 & (5, 128, 128) \\
+\hline
+\textbf{Pipeline của chúng tôi} & \textbf{0.8672} & \textbf{168} & \textbf{225} & (1, 256, 256) \\
+\hline
+\end{tabular}
+
+\vspace{0.5em}
+\scriptsize{\faNote~ \textit{FP: False Positives, FN: False Negatives}}
+\end{frame}

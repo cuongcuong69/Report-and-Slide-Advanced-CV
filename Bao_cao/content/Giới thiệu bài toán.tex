@@ -1,0 +1,32 @@
+\chapter{Giới thiệu bài toán}
+
+U não là một dạng tăng sinh bất thường của các tế bào bên trong hộp sọ, gây ra sự ảnh hưởng trực tiếp đến hệ thần kinh trung ương. Khối u có thể là lành tính hoặc ác tính. Trong nhóm các khối u ác tính, glioma là dạng phổ biến nhất, xuất phát từ các tế bào thần kinh đệm và bao gồm 2 phân nhóm chính: Low-Grade Glioma (LGG) và và High-Grade Glioma (HGG) [...]. Mức độ nguy hiểm của 2 nhóm này khác nhau đáng kể: trong khi LGG tiến triển chậm với thời gian sống trung vị có thể đạt 11.6 - 11.7 năm, thì HGG (đặc biệt GBM) chỉ có thời gian sống trung vị khoảng 15 tháng [...]. Tỷ lệ tử vong cao cùng sự phát triển nhanh chóng của các khối u ác tính khiến việc phát hiện sớm, đánh giá kích thước, xác định ranh giới và lập kế hoạch điều trị trở thành nhiệm vụ then chốt trong thực hành lâm sàng.\\
+
+Trong y khoa hiện đại, ảnh cộng hưởng từ MRI (Magnetic Resonance Imaging) là phương pháp hình ảnh lâm sàng được sử dụng rộng rãi nhất trong chẩn đoán u não do có ưu điểm: không bức xạ ion hóa, độ tương phản mô mềm cao và cung cấp được nhiều chuỗi xung khác nhau phản ánh những đặc tính sinh học riêng của mô não. Việc phân đoạn u não từ ảnh MRI đơn chuỗi là một nhiệm vụ khó khăn do cường độ ảnh có thể bị ảnh hưởng  bởi partial volume effect hoặc ccacs hiện tượng sai lệch trường (bias field artifacts) \cite{article, Bakas2017TCGALGG}. Vì vậy, khối u não thường được chẩn đoán và đánh giá dựa trên các chuỗi MRI đa phương thức, bao gồm T1, T1 có tiêm chất tương phản T1CE, T2, và FLAIR. Khối u não bao gồm 3 phân vùng không chồng lấn:
+\begin{itemize}
+    \item Vùng u tăng sinh (Enhancing Tumor – ET): xuất hiện tăng tín hiệu mạnh trên T1CE.
+    \item Vùng hoại tử hoặc mô không tăng quang (NCR/NET): thường giảm tín hiệu trên T1Gd so với mô lành.
+    \item Vùng phù quanh u (Edema – ED): thể hiện tăng tín hiệu đặc trưng trên FLAIR.
+\end{itemize}
+Các phân vùng này phản ảnh những đặc tính sinh học khác nhau của khối u. Từ 3 phân vùng trên, 3 vùng quan tâm (ROI) thường được sử dụng trong các tài liệu nghiên cứu có thể được tạo thành:
+\begin{itemize}
+    \item Whole Tumor (WT) =  NCR/NET  + ED  + ET $\to$ toàn bộ vùng bất thường liên quan đến khối u.
+    \item Tumor Core (TC) = NCR/NET  + ET $\to$ phần lõi khối u, không tính phù.
+    \item Enhancing Tumor (ET) $\to$ chỉ vùng tăng quang.
+\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/các chuỗi MRI đa phương thức cùng với vùng phân đoạn bằng tay tương ứng của khối u não.png}
+    \caption{Các chuỗi MRI đa phương thức cùng với vùng phân đoạn bằng tay tương ứng của khối u não}
+    \label{fig:placeholder}
+\end{figure}
+
+Phân tích định lượng các ROI nói trên cung cấp những thông tin quan trọng phục vụ chẩn đoán bệnh, lập kế hoạch phẫu thuật và ước lượng tiên lượng, trong đó việc phân đoạn chính xác khối u và các ROI liên quan là vô cùng cần thiết. Các nhãn được vẽ thủ công bởi các chuyên gia chẩn đoán hình ảnh được xem là tiêu chuẩn vàng. Tuy nhiên, việc vẽ nhãn thủ công là quá tốn công sức và mang tính chủ quan, khiến nó trở nên không khả thi trong hầu hết quy trình lâm sàng. Do đó, nhu cầu về các phương pháp phân đoạn u não tự động hoàn toàn là vô cùng cần thiết.\\
+
+\textbf{Bài toán đặt ra:}
+\begin{itemize}
+    \item \textbf{\textit{Đầu vào:}} Ảnh MRI não dạng 2D hoặc 3D với đa chuỗi xung.
+    \item \textbf{\textit{Đầu ra:}} Bản đồ phân đoạn theo tùng vùng u (ET, TC, WT).
+    \item \textbf{\textit{Mục tiêu:}} Xác định chính xác ranh giới u.
+\end{itemize}
+

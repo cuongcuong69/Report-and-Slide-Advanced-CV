@@ -1,0 +1,175 @@
+\documentclass[12pt]{report}
+%\usepackage[fontsize=13pt]{scrextend}
+ \usepackage{amssymb}
+\usepackage{amsmath}    % Gói để hỗ trợ lệnh \numberwithin
+\allowdisplaybreaks
+\usepackage{caption}    % Gói hỗ trợ chỉnh sửa chú thích
+
+\numberwithin{figure}{chapter} % Đặt lại đánh số hình theo số mục
+
+\usepackage{bm} % for bold math symbols
+\usepackage{algorithm}
+\usepackage{tikz,lipsum}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+\definecolor{colback}{HTML}{e2fdff}
+\definecolor{colframe}{HTML}{00b4d8}
+\newtcolorbox{menhde}[1][]{colback=colback, colframe=colframe,
+	fonttitle=\bfseries, title= Mệnh đề}
+\newtcolorbox{dinhly}[1][]{colback=colback, colframe=colframe,
+	fonttitle=\bfseries, title= Định lý}
+
+%%%%%%%%%%%%%% Définition des couleurs
+\definecolor{shadow@color}{cmyk}{.07,0,0,0.49}
+\definecolor{col1}{RGB}{12, 102, 98}
+\definecolor{col2}{RGB}{248, 193, 12}
+\definecolor{col3}{RGB}{236, 67, 1} 
+\colorlet{colexam}{red!75!black}
+\definecolor{winered}{rgb}{0.5,0,0}
+\definecolor{anti-flashwhite}{rgb}{0.95, 0.95, 0.96}
+\definecolor{antiquewhite}{rgb}{0.98, 0.92, 0.84}
+\definecolor{beige}{rgb}{0.96, 0.96, 0.86}
+\definecolor{burlywood}{rgb}{0.87, 0.72, 0.53}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{bgblue}{RGB}{197,219,229}
+\colorlet{colexam}{red!75!black}
+\definecolor{winered}{rgb}{0.5,0,0}
+\definecolor{shadow@color}				{cmyk}{.07,0,0,0.49}
+\definecolor{section@title@color}		{cmyk}{1,0.2,0.3,0.1}
+\definecolor{subsection@title@color}		{cmyk}{0,0.6,0.9,0}
+\definecolor{subsubsection@title@color}	{cmyk}{0.71,0,0.87,0.35}
+\newcommand{\code}[1]{\texttt{#1}}
+
+%===========================================	
+\newcounter{example}
+\tcbset{
+	base/.style={
+		empty,
+		frame engine=path,
+		colframe=yellow!10,
+		sharp corners,
+		title={Chứng minh},
+		attach boxed title to top left={yshift*=-\tcboxedtitleheight},
+		boxed title style={size=minimal, top=4pt, left=4pt},
+		coltitle=colexam,fonttitle=\large\bfseries\sffamily,
+	}
+}
+
+\newtcolorbox[use counter=example]{chungminh}{%
+	base,
+	drop fuzzy shadow,
+	borderline west={3pt}{-3pt}{colexam},
+}
+
+
+
+\usepackage{algpseudocode}
+\usepackage{template}
+\usepackage{hyperref}
+%\usepackage{txfonts}
+\usepackage{comment}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{adjustbox} % Gói để thu nhỏ bảng
+\usepackage{makecell}
+\usepackage{tabularx}
+\usepackage{float} % for [H] option
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage[table]{xcolor}
+\usepackage{subcaption}
+%\usepackage{indentfirst} % thụt lề đoạn đầu tiên
+
+% Disable indentation on new paragraphs
+%\setlength{\parindent}{0pt}
+
+% Line spacing 1.5
+\renewcommand{\baselinestretch}{1.6}
+
+% Optional: graphic path
+% \graphicspath{PATH_TO_GRAPHIC_FOLDER}
+
+% To use Times font family, uncomment this row
+\usepackage{mathptmx}
+
+% To use roman section / subsection, uncomment these rows
+% \renewcommand{\thesection}{\Roman{section}}
+% \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+
+% Define course name, report name and report title.
+\newcommand{\coursename}{Một số vấn đề chọn lọc về Thị giác máy tính}
+\newcommand{\reportname}{Tên đề tài}
+\newcommand{\reporttitle}{Báo cáo bài tập lớn}
+
+\newcommand{\studentname}{
+\makebox[\textwidth][l]{Lê Mạnh Cương -- 22001551} \\
+\makebox[\textwidth][l]{Nguyễn Tuấn Anh -- 22001541} \\
+\makebox[\textwidth][l]{Phạm Quý Đô -- 22001562} \\
+\makebox[\textwidth][l]{\textit{K67A3 -- Khoa học Máy tính và Thông tin} } } 
+\newcommand{\teachername}{\hfill TS. Cao Văn Chung}
+
+
+
+% Header
+\lhead{\rightmark}
+\rhead{
+Một số vấn đề chọn lọc về Thị giác máy tính
+}
+
+% Footer
+\newcommand{\leftfooter}{}
+\lfoot{\leftfooter}
+% Định nghĩa cột căn trái với chiều rộng cố định và tự xuống dòng
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+% Cột căn giữa có chiều rộng cố định
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+% ============ DOCUMENT ============
+\begin{document}
+\setstretch{1.6}
+\input{content/title.tex}
+\pagenumbering{roman}
+% ---------- Lời cảm ơn ----------
+\clearpage
+\begin{comment}
+\begin{center}
+    \Huge\textbf{Lời cảm ơn}
+\end{center}
+------
+
+\textit{Xin trân trọng cảm ơn!}
+\vspace{2cm}
+\clearpage
+\end{comment}
+
+\tableofcontents
+\pagebreak
+\listoftables
+\pagebreak
+\listoffigures
+\pagebreak
+
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+
+\input{content/Giới thiệu bài toán}
+\input{content/Dataset}
+\input{content/Phương pháp}
+\input{content/Thực nghiệm}   
+\input{content/Kết quả và thảo luận}
+
+
+
+
+% References
+%\input{ref/ref.tex}
+
+% Appendix
+\appendix
+% Add \cleardoublepage to move appendices to next page.
+\input{appendix/appendix.tex}
+\end{document}

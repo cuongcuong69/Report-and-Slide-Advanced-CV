@@ -1,0 +1,13 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Kết quả inference mô hình UNet trên tập test}}{38}{table.caption.28}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Kết quả inference UNet++ trên tập test}}{39}{table.caption.32}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Kết quả đánh giá các mô hình VNet trên các vùng WT, TC và ET.}}{41}{table.caption.34}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Kết quả đánh giá các mô hình UNETR trên các vùng WT, TC và ET}}{43}{table.caption.40}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Kết quả inference mô hình Swin UNet3D trên tập test}}{45}{table.caption.43}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces So sánh các phương pháp trên ROI WT}}{47}{table.caption.48}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces So sánh các phương pháp trên ROI TC}}{47}{table.caption.49}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces So sánh các phương pháp trên ROI ET}}{47}{table.caption.50}%

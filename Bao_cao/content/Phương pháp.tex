@@ -1,0 +1,311 @@
+\chapter{Phương pháp}
+\section{Quy trình tổng quan}
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{"img/Quy trình tổng quan"}
+
+\label{fig:quy-trinh-tong-quan}
+\end{figure}
+\section{UNet}
+
+U-Net là một kiến trúc mạng nơ-ron tích chập (CNN) được đề xuất năm 2015 cho bài toán phân đoạn ảnh. Khác với các mô hình phân loại ảnh chỉ gán một nhãn cho toàn bộ bức ảnh, U-Net được thiết kế để gán nhãn cho từng điểm ảnh (pixel-wise), tức là ánh xạ ảnh đầu vào kích thước $H \times W$ (với $C$ kênh) sang một bản đồ nhãn cùng kích thước không gian, trong đó mỗi pixel được gán vào một trong $K$ lớp (bao gồm cả nền và các vùng khối u như WT, TC, ET).
+
+Điểm đặc trưng của U-Net là kiến trúc đối xứng dạng chữ U gồm hai nhánh:
+\begin{itemize}[itemsep=0.1em, left=3em, parsep=0em, topsep=0.1em]
+    \item \textbf{Nhánh encoder (contracting path)} ở bên trái: trích xuất đặc trưng và thu gọn dần kích thước không gian.
+    \item \textbf{Nhánh decoder (expansive path)} ở bên phải: khôi phục lại độ phân giải không gian và sinh bản đồ phân đoạn đầu ra.
+\end{itemize}
+Hai nhánh được kết nối với nhau bằng các \emph{skip connection}, giúp kết hợp thông tin chi tiết mức thấp (biên, texture) với thông tin ngữ nghĩa mức cao (ngữ cảnh toàn cục). Sơ đồ tổng quan kiến trúc U-Net được minh họa trong Hình~\ref{fig:unet-architect}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/unet_architecture.png}
+    \caption{Sơ đồ tổng quan kiến trúc U-Net \cite{ronneberger2015unet}}
+    \label{fig:unet-architect}
+\end{figure}
+
+\textbf{Nhánh encoder (contracting path).}
+Nhánh encoder của U-Net có cấu trúc tương tự một CNN dùng cho phân loại: mỗi tầng (level) gồm hai lớp tích chập $3 \times 3$ liên tiếp (thường kèm BatchNorm và hàm kích hoạt ReLU), sau đó là một lớp gộp cực đại (MaxPooling) kích thước $2 \times 2$ với stride $2$ để giảm một nửa kích thước không gian:
+\[
+(H, W, C) \xrightarrow{\text{Conv–BN–ReLU} \times 2} (H, W, C') \xrightarrow{\text{MaxPool } 2\times2} \left(\frac{H}{2}, \frac{W}{2}, C''\right).
+\]
+Sau mỗi lần down-sampling, số kênh đặc trưng thường được tăng gấp đôi (ví dụ $32 \rightarrow 64 \rightarrow 128 \rightarrow 256 \rightarrow 512$), giúp mạng học được các đặc trưng ngày càng trừu tượng hơn, đồng thời mở rộng \emph{receptive field} để thu được nhiều ngữ cảnh toàn cục.
+
+\textbf{Lớp bottleneck.}
+Tại đáy của chữ U là khối \emph{bottleneck}, cũng gồm hai lớp tích chập $3 \times 3$ liên tiếp. Đây là nơi tập trung các đặc trưng có mức trừu tượng cao nhất, đại diện cho nội dung toàn cục của lát cắt 2D. Trong mô hình UNet 2D sử dụng trong báo cáo này, bottleneck là tầng có số kênh lớn nhất và đóng vai trò cầu nối giữa encoder và decoder.
+
+\textbf{Nhánh decoder (expansive path) và skip connection.}
+Nhánh decoder có nhiệm vụ khôi phục dần độ phân giải không gian để tạo bản đồ phân đoạn đầu ra. Mỗi level trong decoder thường gồm:
+\begin{enumerate}[itemsep=0.1em, left=3em, parsep=0em, topsep=0.1em]
+    \item Một bước \emph{upsampling} (ví dụ dùng transposed convolution với kernel $2 \times 2$ và stride $2$, hoặc nội suy bilinear kết hợp tích chập) để phóng to kích thước không gian lên gấp đôi.
+    \item Phép \textbf{concatenate} với feature map tương ứng ở cùng mức trong encoder thông qua skip connection.
+    \item Hai lớp tích chập $3 \times 3$ (có thể kèm BatchNorm + ReLU) để trộn và tinh chỉnh đặc trưng sau khi ghép.
+\end{enumerate}
+Các skip connection giúp mô hình tận dụng lại đặc trưng biên và chi tiết hình học ở độ phân giải cao từ encoder (thường bị mất một phần khi pooling) và kết hợp chúng với thông tin ngữ nghĩa ở decoder. Nhờ vậy, U-Net vừa nắm bắt được bối cảnh toàn cục, vừa giữ được ranh giới khối u một cách sắc nét, đặc biệt hữu ích trong phân đoạn các vùng nhỏ như TC và ET.
+
+\textbf{Lớp đầu ra và bản đồ nhãn.}
+Sau khi đi qua toàn bộ các tầng của decoder, feature map cuối cùng có kích thước không gian $H \times W$ tương ứng với kích thước lát cắt đầu vào, nhưng với số kênh đặc trưng $C_{\text{feat}}$ lớn. U-Net sử dụng một lớp tích chập $1 \times 1$ để ánh xạ $C_{\text{feat}}$ kênh này về $K$ kênh tương ứng với $K$ lớp cần phân đoạn:
+\[
+\mathbb{R}^{H \times W \times C_{\text{feat}}} \xrightarrow{\text{Conv } 1\times1} \mathbb{R}^{H \times W \times K}.
+\]
+Sau đó, áp dụng softmax (đa lớp) hoặc sigmoid (đa nhãn) tại mỗi pixel để thu được phân bố xác suất theo lớp. Các hàm mất mát cụ thể (Dice loss, Dice + Cross-Entropy) được trình bày chi tiết trong phần Hàm mất mát.
+
+\textbf{UNet 2D cho phân đoạn u não.}
+Bài toán này sử dụng UNet 2D, xử lý từng lát cắt 2D được trích từ thể tích MRI 3D của bộ dữ liệu BraTS. Tất cả các phép tích chập, pooling và upsampling đều là 2D. Đầu vào của mạng là các lát cắt kích thước $H \times W$ với nhiều kênh (các modality MRI khác nhau), đầu ra là bản đồ phân đoạn 2D cùng kích thước, với các kênh tương ứng các vùng khối u quan tâm (WT, TC, ET). Cách tiếp cận này giúp giảm chi phí tính toán so với UNet 3D, nhưng vẫn tận dụng được sức mạnh của kiến trúc chữ U và các skip connection trong việc phân đoạn cấu trúc não bộ phức tạp.
+
+\section{UNet++}
+UNet++ \cite{zhou2018unetpp} là một biến thể nâng cấp của UNet, được thiết kế đặc biệt để cải thiện khả năng phân đoạn ảnh y khoa. Hạn chế chính của UNet nằm ở skip connections nguyên bản, vốn nối trực tiếp feature từ encoder sang decoder mặc dù hai loại feature này có mức độ trừu tượng khác nhau.\\
+UNet++ giải quyết vấn đề đó thông qua:
+\begin{enumerate}
+\item Thiết kế lại skip connections
+\item Deep supervision
+\item Khả năng pruning linh hoạt
+\end{enumerate}
+Trong UNet:
+\begin{itemize}
+\item Feature encoder mang chi tiết không gian, mức trừu tượng thấp.
+\item Feature decoder ở giai đoạn sâu lại giàu ngữ nghĩa, mức trừu tượng cao
+\end{itemize}
+$\to$ Khi ghép 2 loại feature này, xảy ra semantic gap khiến mô hình học khó hơn.
+\subsection{Skip connections được thiết kế lại trong UNet++}
+UNet++ không nối thẳng encoder với decoder nữa. Thay vào đó mỗi đường skip sẽ trả qua một chuỗi các khối \textbf{dense convolution}: nối tấtcả
+các đầu vào trướcđó + feature được upsample từ tầng sâu hơn $\to$ Nâng dần mức ngữ nghĩa của feature encoder để tiệm cận decoder trước khi ghép vào nhau $\to$ mạng học dễ dàng hơn, kết quả phân đoạn chi tiết hơn.
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{"img/Kiến trúc tổng quan và skip connections của UNet++"}
+\caption{Kiến trúc tổng quan và skip connections của UNet++}
+\label{fig:kien-truc-tong-quan-va-skip-connections-cua-unet}
+\end{figure}
+\subsection{Deep Supervision trong UNet++}
+Mục đích:
+\begin{itemize}
+\item Giúp gradient lan truyền trực tiếp vào các tầng giữa $\to$ huấn luyện nhanh và ổn định hơn 
+\item Cho phép lựa chọn nhiều đầu ra phân đoạn tương ứng với các độ sâu khác nhau
+\end{itemize}
+2 chế độ:
+\begin{itemize}
+\item \textbf{Accurate mode:} Dùng tất cả các nhánh phân đoạn, tổng hợp hoặc lấy trung bình đầu ra $\to$ kết quả chính xác nhất.
+\item \textbf{Fast mode:} 
+\begin{itemize}
+\item Chỉ chọn một nhánh ($L^1, L^2$ hoặc $L^4$) để inference
+\item  Các nhánh còn lại có thể cắt bỏ (prune)
+\item Giảm mạnh kích thước mô hình và thời gian chạy inference
+\end{itemize}
+\end{itemize}
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{"img/Deep supervision UNet++"}
+\label{fig:deep-supervision-unet}
+\end{figure}
+
+\section{V-Net}
+V-Net \cite{milletari2016vnetfullyconvolutionalneural} được thiết kế như một mạng fully convolutional 3D dành riêng cho các bài toán phân đoạn thể tích trong ảnh y khoa. Khác với các mô hình 2D truyền thống chỉ xử lý từng lát cắt, V-Net học trực tiếp trên toàn bộ thể tích 3D và sinh ra bản đồ phân đoạn 3D cùng kích thước, cho phép mô hình nắm bắt trọn vẹn ngữ cảnh không gian theo ba chiều.\\
+
+Kiến trúc của V-Net gồm hai phần đối xứng tạo thành dạng chữ V: một nhánh nén đặc trưng (compression path) và một nhánh giải nén (decompression path), được kết nối với nhau bằng các skip connection. Sơ đồ tổng quan của mô hình được minh họa trong Hình \ref{fig:v-net}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{img/Sơ đồ tổng quan kiến trúc V-Net.png}
+    \caption{Sơ đồ tổng quan kiến trúc V-Net}
+    \label{fig:v-net}
+\end{figure}
+\noindent\ding{113}~ \textbf{Kiến trúc chữ V và cơ chế học đặc trưng}\\
+Trong nhánh encoder ở bên trái, V-Net trích xuất đặc trưng ở nhiều mức độ phân giải khác nhau. Mỗi mức (stage), mô hình sử dụng 1 đến 3 lớp tích chập 3D với kernel $5 \times 5 \times 5$ và padding phù hợp để duy trì kích thước không gian trong phạm vi stage. Các lớp tích chập được kết hợp với hàm kích hoạt Parametric ReLU (PReLU). PReLU là một biến thể của ReLU cho phép học hệ số âm thay vì cố định ở 0.\\
+Hàm PReLu được định nghĩa như sau:
+\[
+f(x) =
+\begin{cases}
+x, & x \ge 0,\\
+ax, & x < 0.
+\end{cases}
+\]
+trong đó $\alpha$ là một tham số có thể học được. Ưu điểm của PReLU là tránh việc triệt tiêu hoàn toàn thông tin tại các vùng đầu vào âm như ReLU truyền thống, từ đó cải thiện khả năng tối ưu và tốc độ hội tụ.\\
+Một đặc điểm nữa của thiết kế V-Net là việc sử dụng residual block cho từng stage. Đầu vào $x$ được đưa qua chuỗi tích chập -- PReLU để tạo tín hiệu biến đổi $F(x)$, sau đó được cộng trực tiếp trở lại với chính $x$, tạo thành:
+\begin{align*}
+    y = x + F(x)
+\end{align*}
+Sự kết hợp dạng residual này giảm thiểu hiện tượng gradient vanishing, cho phép mạng sâu hơn nhưng vẫn ổn định trong quá trình huấn luyện.\\
+
+Để giảm kích thước thước không gian khi đi sâu vào mạng, V-Net không dùng max-pooling như U-Net mà thay thế hoàn toàn bằng tích chập 3D có stride = 2 với kernel $2 \times 2 \times 2$ giúp giảm một nửa kích thước theo mỗi chiều đồng thời tăng gấp đôi số kênh. Điều này không chỉ làm giàu biểu diễn đặc trưng mà còn mang lại ưu điểm so với pooling: mạng có thể học được cách tổng hợp thông tin khi downsample, thay vì dùng quy tắc cứng như max-pooling. Cơ chế downsampling này được mô tả trong Hình \ref{fig:downsample-vnet}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/Cơ chế down-sampling VNet.png}
+    \caption{VNet downsample sử dụng tích chập 3D với kernel size $2 \times 2 \times 2$ và stride = 2}
+    \label{fig:downsample-vnet}
+\end{figure}
+\ding{113}~ \textbf{Nhánh decoder và skip connetions}\\
+Nhánh decoder bên phải thực hiện khôi phục lại độ phân giải không gia, đảo ngược quá trình nén đặc trưng. Mỗi stage trong nhánh này bắt đầu bằng một lớp deconvolution (transposed convolution) 3D với kernel $2 \times 2 \times 2$ và stride = 2. Phép toán này mở rộng kích thước không gian gấp đôi trong khi giảm số lượng kênh đặc trưng, đóng vai trò tương ứng với phép downsampling ở nhánh trái. Hình \ref{fig:upsamle-vnet} minh họa cơ chế upsampling của nhánh decoder.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/Upsampling V-Net.png}
+    \caption{VNet upsampling sử dụng transposed convolution 3D với kernel size $2 \times 2 \times 2$ và stride = 2}
+    \label{fig:upsamle-vnet}
+\end{figure}
+V-Net sử dụng các skip connection giữa các stage đối xứng của hai nhánh. Sau mỗi lần upsampling, feature map từ decoder được concatenate với feature map ở cùng độ phân giải từ encoder. Nhờ đó, mô hình kết hợp được cả thông tin chi tiết ở độ phân giải cao (từ encoder) lần thông tin trừu tượng ở độ phân giải thấp (từ decoder). Cơ chế này giúp tăng độ chính xác phân đoạn, đặc biệt là tại các vị trí biên mờ hoặc cấu trúc nhỏ.\\
+
+Sau khi đi qua toàn bộ các stage decoder, VNet sử dụng một lớp tích chập $1 \times 1 \times 1$ để đưa số kênh về đúng số lớp cần phân đoạn trước khi áp dụng softmax voxel-wise để sinh phân bố xác xuất cho từng voxel.
+
+
+\subsection{UNETR}
+
+UNETR (UNEt TRansformers) \cite{hatamizadeh2021unetr}
+ là kiến trúc lai giữa Transformer và CNN dành cho phân đoạn ảnh y tế 3D. Để khắc phục hạn chế về vùng tiếp nhận cục bộ của các mạng tích chập truyền thống, UNETR sử dụng encoder Transformer để mã hóa ảnh dưới dạng chuỗi patch 3D, giúp học hiệu quả các phụ thuộc dài hạn và ngữ cảnh toàn cục. Các biểu diễn này được kết hợp với một decoder CNN thông qua hệ thống skip connection đa độ phân giải, giúp mô hình vừa nắm bắt thông tin diện rộng, vừa duy trì được các chi tiết không gian cục bộ để dự đoán kết quả phân đoạn chính xác.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/overview_unetr.png}
+    \caption{Tổng quan về UNETR}
+    \label{fig:unetpp-architect}
+\end{figure}
+
+
+Kiến trúc của UNETR gồm hai phần đối xứng theo dạng chữ U: một nhánh encoder sử dụng transformer để trích xuất đặc trưng toàn cục từ thể tích đầu vào và một nhánh decoder để khôi phục độ phân giải, trong đó hai nhánh được kết nối với nhau thông qua các skip connection ở nhiều mức độ phân giải nhằm tạo ra kết quả phân đoạn ngữ nghĩa cuối cùng. Sơ đồ tổng quan mô hình được minh họa trong các hình dưới đây:
+
+% TODO: \usepackage{graphicx} required
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\linewidth]{img/unetr_architect}
+\caption{Sơ đồ tổng quan kiến trúc UNETR}
+\label{fig:unetrarchitect}
+\end{figure}
+
+
+\noindent\ding{113}~ \textbf{Biểu diễn đầu vào và embedding}\\
+Thể tích đầu vào 3D 
+\[
+\mathbf{x} \in \mathbb{R}^{H \times W \times D \times C}
+\]
+được chia thành các patch 3D không chồng lắp có kích thước $(P, P, P)$. 
+Các patch này được làm phẳng và sắp xếp thành một chuỗi một chiều, sau đó được chiếu vào không gian embedding $K$ chiều thông qua một lớp tuyến tính. 
+Để giữ thông tin vị trí không gian, embedding vị trí một chiều có thể học được được cộng vào embedding của mỗi patch. 
+UNETR không sử dụng token \texttt{[class]} do mô hình phục vụ cho bài toán phân đoạn.
+
+\noindent\ding{113}~ \textbf{Encoder dựa trên Transformer}\\
+Encoder bao gồm một chồng các khối transformer, mỗi khối gồm Multi-Head Self-Attention (MSA) và MLP, kết hợp với Layer Normalization và residual connection. Cơ chế self-attention cho phép mô hình học được quan hệ dài hạn giữa các patch trong toàn bộ thể tích 3D.
+
+
+\noindent\ding{113}~ \textbf{Trích xuất đặc trưng và skip connection}\\
+Tại một số tầng Transformer trung gian, các biểu diễn chuỗi được reshape thành tensor 3D và được chiếu sang không gian đặc trưng thông qua các lớp tích chập $3 \times 3 \times 3$. Các đặc trưng này được truyền trực tiếp tới decoder thông qua skip connection, giúp bảo toàn thông tin không gian chi tiết.
+
+
+\noindent\ding{113}~ \textbf{Decoder và đầu ra}\\
+Decoder thực hiện quá trình upsampling từng bước bằng các lớp deconvolution, bắt đầu từ đầu ra Transformer cuối cùng đóng vai trò nút thắt cổ chai (\textit{bottleneck}) ở độ phân giải thấp nhất. Các đặc trưng này được kết hợp với các đặc trưng từ encoder thông qua skip connection và được tinh chỉnh bằng các lớp tích chập. Cuối cùng, một lớp tích chập $1 \times 1 \times 1$ kết hợp với hàm softmax tạo ra bản đồ phân đoạn ngữ nghĩa theo từng voxel.
+
+
+\section{Swin UNet3D}
+Trong những năm gần đây, các phương pháp phân đoạn ảnh y khoa 3D chủ yếu dựa trên 3 hướng tiếp cận chính:
+\begin{enumerate}
+\item \textbf{Các mô hình thuần CNN:} hiệu quả vượt trội trong việc học các đặc trưng cục bộ, tuy nhiên gặp khó khăn trong việc nắm bắt các mối quan hệ phụ thuộc dài hạn và ngữ cảnh toàn cục.
+\item \textbf{Các mô hình thuần Vision Transformer:} xử lý dữ liệu ảnh dưới dạng token một chiều và sử dụng cơ chế self-attention để mô hình hóa các mối quan hệ phụ thuộc xa. Mặc dù khai thác hiệu quả ngữ cảnh toàn cục, việc thiếu các inductive bias vốn có của tích chập khiến các mô hình ViT gặp phải hạn chế trong việc học các đặc trưng cục bộ và chi tiết hình học quan trọng.
+\item \textbf{Các kiến trúc lai kết hợp CNN và ViT:} nhằm tận dụng ưu điểm của 2 loại mô hình. Tuy nhiên, phần lớp các mô hình lai dựa trên cơ chế self-attention toàn cục của Transformer, dấn đến sự gia tăng đáng kể về độ phức tạp tính toán và số lượng tham số.
+\end{enumerate}
+$\Rightarrow$ Swin UNet3D được đề xuất để giải quyết hạn chế trên, trong đó cơ chế attention theo cửa sổ và dịch cửa sổ được kết hợp với cấu trúc U-Net và các khối tích chập 3D để đạt được sự cân bằng giữa hiệu quả biểu diễn và chi phí tính toán.
+\subsection{Tổng quan kiến trúc}
+Swin UNet3D tuân theo khung UNet: Encoder $\to$ Decoder và skip connections theo từng mức phân giải.
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{"img/minh họa kiến trúc tổng thể và các khối chính trong từng stage của Swin UNet3D"}
+\caption{Kiến trúc tổng thể và các khối chính trong từng stage của Swin UNet3D}
+\label{fig:minh-hoa-kien-truc-tong-the-va-cac-khoi-chinh-trong-tung-stage-cua-swin-unet3d}
+\end{figure}
+Hình \ref{fig:minh-hoa-kien-truc-tong-the-va-cac-khoi-chinh-trong-tung-stage-cua-swin-unet3d} minh họa kiến trúc tổng thể và các khối chính trong từng stage. Trong kiến trúc:
+\begin{itemize}
+\item \textbf{Patch Merging3D}: giảm độ phân giải (downsampling) trong encoder.
+\item \textbf{Patch Expanding3D}: tăng độ phân giải (upsampling) trong decoder.
+\item \textbf{Swin Block3D}: trích xuất đặc trưng dựa trên attention theo cửa sổ; học phụ thuộc xa và thông tin toàn cục trong ảnh
+\item \textbf{Conv Block3D}: trích xuất đặc trưng cục bộ, học phụ thuộc gần.
+\item Ở mỗi stage, đặc trưng từ nhánh Swin và nhánh Conv được kết hợp để tạo biểu diễn giàu thông tin hơn.
+\end{itemize}
+\subsection{Biểu diễn đầu vào theo voxel patch và token}
+Đầu vào là ảnh 3D 
+\begin{align*}
+X \in \mathbb{R}^{H \times W \times D \times C}
+\end{align*}
+Bước đầu tiên là chia ảnh 3D thành các voxel patch không chồng lấp kích thước $4 \times 4 \times 4$. Mỗi patch sau đó:
+\begin{enumerate}
+\item Flatten thành vector 1D
+\item Qua linear embedding để ánh xạ vào không gian đặc trưng.
+\end{enumerate}
+Kết quả: ảnh được mã hóa thành tensor token có kích thước
+\begin{align*}
+\frac{H}{4} \times \frac{W}{4} \times\frac{D}{4} \times C
+\end{align*}
+\subsection{Thiết kế theo stage: DownStage và Upstage}
+Kiến trúc được tổ chức theo các stage:
+\begin{itemize}
+\item \textbf{DownStage (Encoder)}: thực hiện giảm kích thước không gian và tăng mức trừu tượng của đặc trưng. \\
+Cấu thành điển hình:
+\begin{itemize}
+\item Patch Merging3D
+\item Nhiều Swin Block3D
+\item Nhánh Conv Block3D 
+\item Hợp nhất đặc trưng
+\end{itemize}
+\item \textbf{UpStage (Decoder)}: khôi phục độ phân giải dần về kích thước đầu vào\\
+Cấu thành điển hình:
+\begin{itemize}
+\item Patch Expanding3D
+\item Nhiều Swin Block3D
+\item Nhánh Conv Block3D
+\item Kết hợp skip connection từ encoder (cùng mức phân giải)
+\item Hợp nhất đặc trưng
+\end{itemize}
+\end{itemize}
+
+\section{Hàm mất mát}
+\subsection{Dice loss cho phân đoạn đa lớp}
+
+Dice coefficient là độ đo phổ biến trong phân đoạn y sinh và đặc biệt hiệu quả đối với dữ liệu mất cân bằng. Với $p_{c,i}$ là xác suất dự đoán voxel $i$ thuộc lớp $c$ và $g_{c,i}$ là nhãn one-hot tương ứng, hệ số Dice cho mỗi lớp được định nghĩa:
+
+\begin{align*}
+\text{Dice}_c = 
+\frac{2\sum_i p_{c,i} g_{c,i} + \epsilon}
+{\sum_i p_{c,i}^2 + \sum_i g_{c,i}^2 + \epsilon}
+\end{align*}
+
+Dice đa lớp được tính bằng trung bình trên $C$ lớp:
+\begin{align*}
+\text{Dice}_{\text{mean}} = \frac{1}{C}\sum_{c=1}^{C}\text{Dice}_c
+\end{align*}
+
+Dice loss được xác định:
+\[
+\mathcal{L}_{Dice} = 1 - \text{Dice}_{\text{mean}}
+\]
+
+\textbf{Ưu điểm:}
+\begin{itemize}
+    \item Ít nhạy với mất cân bằng lớp.
+    \item Tối ưu trực tiếp độ chồng lấp vùng, phù hợp với chỉ số đánh giá trong BraTS.
+\end{itemize}
+
+\textbf{Hạn chế:}
+\begin{itemize}
+    \item Gradient có thể kém ổn định ở giai đoạn đầu huấn luyện.
+\end{itemize}
+
+\subsection{Hàm mất mát kết hợp Dice + Cross-Entropy}
+
+Cross-entropy (CE) cung cấp tín hiệu gradient ổn định ở mức voxel, trong khi Dice loss tập trung vào tối ưu vùng. Để tận dụng ưu điểm của cả hai, hàm mất mát kết hợp được sử dụng.
+
+Multiclass cross-entropy được định nghĩa:
+\begin{align*}
+\mathcal{L}_{CE} = 
+- \frac{1}{N}\sum_{i=1}^{N}\sum_{c=1}^{C} g_{c,i}\log p_{c,i}
+\end{align*}
+
+Hàm mất mát DiceCE:
+\begin{align*}
+\mathcal{L}_{DiceCE} = \mathcal{L}_{Dice} + \mathcal{L}_{CE}
+\end{align*}
+
+\textbf{Ưu điểm:}
+\begin{itemize}
+    \item Kết hợp tối ưu vùng (Dice) và phân loại voxel ổn định (CE).
+    \item Cải thiện hội tụ và độ ổn định trong huấn luyện so với Dice loss đơn lẻ.
+\end{itemize}
+

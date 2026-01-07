@@ -1,0 +1,808 @@
+\documentclass[aspectratio=169]{beamer}
+
+%------------------ Beamer theme & fonts ------------------
+\usetheme{Madrid}
+\usefonttheme{structurebold}
+\usefonttheme[onlymath]{serif}
+
+%------------------ Packages ------------------
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\usepackage{algorithm2e}
+\usepackage[utf8]{vietnam}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{mathtools}
+\usepackage{multicol}
+\usepackage{comment}
+\usepackage{forest}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{diagbox}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{stmaryrd}
+\usepackage[style=authortitle,backend=bibtex]{biblatex}
+\usepackage{ulem}
+\usepackage{fontawesome5}
+\usetikzlibrary{arrows.meta,positioning}
+\input{KhaiBao-Color.tex}
+\input{KhaiBao-tcolorbox.tex}
+\addbibresource{thesiscite.bib}
+
+%------------------ Colors & theorem ------------------
+\definecolor{BKTemplate}{rgb}{0.11765, 0.30588, 0.47451}
+\usecolortheme[named=BKTemplate]{structure}
+\setbeamercolor{title}{fg=BKTemplate,bg=}
+\setbeamertemplate{caption}[numbered]
+
+\renewcommand{\footnotesize}{\tiny}
+\newcommand{\mathbi}[1]{\boldsymbol{#1}}
+\newtheorem{proposition}{Proposition}
+
+\definecolor{customcolframe}{HTML}{034694}
+\definecolor{customcolback}{HTML}{F0F8FF}
+\setbeamercolor{subsection in toc}{parent=section in toc}
+
+%Newcommand (customize)
+\newcommand{\code}[1]{\texttt{#1}}
+% Định nghĩa lại lệnh \blue và \red
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+% Màu mở rộng
+\newcommand{\green}[1]{\textcolor{green!60!black}{#1}}   % xanh lá đậm
+\newcommand{\orange}[1]{\textcolor{orange}{#1}}          % cam
+\newcommand{\purple}[1]{\textcolor{violet}{#1}}          % tím
+\newcommand{\cyan}[1]{\textcolor{cyan!80!black}{#1}}     % xanh cyan đậm
+\newcommand{\magenta}[1]{\textcolor{magenta}{#1}}        % hồng tím
+\newcommand{\gray}[1]{\textcolor{gray}{#1}}              % xám
+\newcommand{\brown}[1]{\textcolor{brown}{#1}}            % nâu
+
+% Màu nổi bật tùy chỉnh
+\newcommand{\highlightyellow}[1]{\textcolor{yellow!80!black}{#1}} % vàng đậm
+\newcommand{\highlightblue}[1]{\textcolor{blue!70!black}{#1}}     % xanh navy
+
+
+\usepackage{pifont} % để dùng dấu ✓ và ✗
+%------------------ Title info ------------------
+\title[Phân đoạn u não]{
+Phân đoạn u não dựa trên dữ liệu ảnh MRI
+}
+\subtitle{}
+\author[Nhóm 6]{%
+  Lê Mạnh Cương\inst{1} \and Nguyễn Tuấn Anh\inst{2} \and Phạm Quý Đô\inst{3}\\[0.5em]
+}
+\institute[]{%
+  Khoa Toán - Cơ - Tin học\\
+  Trường Đại học Khoa học Tự Nhiên - ĐHQGHN
+}
+\date[\today]{\today}
+
+%------------------ TOC at each section ------------------
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Nội dung}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+%------------------ Document ------------------
+\begin{document}
+
+% Background for title page
+\setbeamertemplate{background canvas}%
+{%
+  \includegraphics[width=\paperwidth,height=\paperheight]{images/Background_mo_dau.pdf}%
+}
+
+\begin{frame}[plain]
+\vspace*{1.8cm}
+  \titlepage
+\end{frame}
+
+% Background for all other frames
+\setbeamertemplate{background canvas}%
+{%
+  \includegraphics[width=\paperwidth,height=\paperheight]{images/Background_frame.pdf}%
+}
+
+%------------------ Nội dung chính ở đây ------------------
+\section{Giới thiệu bài toán}
+\begin{frame}{Giới thiệu bài toán phân đoạn u não trên ảnh MRI}
+\begin{itemize}
+\item \textbf{U não} là sự tăng sinh bất thường của tế bào trong hộp sọ, gây ảnh hưởng trực tiếp đến hệ thần kinh trung ương.
+\item \textbf{Glioma} là nhóm u ác tính phổ biến nhất:
+\begin{itemize}
+\item \textbf{LGG:} tiến triển chậm, thời gian sống trung vị $\approx$ 11.6 năm
+\item \textbf{HGG:} tiến triển nhanh, thời gian sống trung vị $\approx$ 15 tháng
+\end{itemize}
+\item Ý nghĩa lâm sàng: phát hiện sớm -- đo kích thước -- xác định biên u -- lập kế hoạch điều trị.
+\item Phân đoạn thủ công: tốn nhiều thời gian, công sức $\to$ nhu cầu về các phương pháp phân đoạn u não tự động.
+\end{itemize}
+\begin{figure}[H]
+\centering
+\label{fig:hgg-vs-lgg1}
+\includegraphics[width=0.45\linewidth]{"images/HGG vs LGG1"}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Ảnh MRI đa phương thức và các phân vùng khối u}
+\small   % hoặc \footnotesize, \scriptsize tùy mức bạn muốn
+
+\begin{columns}[t]
+
+    \begin{column}{0.6\textwidth}
+       \textbf{Ưu điểm của MRI:}
+       \begin{itemize}
+       \item Không bức xạ ion hóa
+       \item Độ tương phản mô mềm cao
+       \item Có nhiều chuỗi xung $\to$ phản ánh đặc tính sinh học khác nhau.
+       \end{itemize}
+
+       Các chuỗi thường dùng:
+       \begin{itemize}
+       \item T1, T1ce (tiêm tương phản)
+       \item T2, Flair
+       \end{itemize}
+
+       Các phân vùng u trong ảnh MRI:
+       \begin{itemize}
+       \item ET (Enhancing Tumor): tăng tín hiệu mạnh trên T1ce
+       \item NCR/NET: mô hoại tử hoặc không tăng quang
+       \item ED (Edema): vùng phù quanh u, tăng tín hiệu trên Flair.
+       \end{itemize}
+    \end{column}
+
+    \begin{column}{0.4\textwidth}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{"images/MRI đa chuỗi"}
+    \label{fig:mri-a-chuoi}
+    \end{figure}
+    
+    \end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Bài toán phân đoạn u não từ ảnh MRI}
+\begin{itemize}
+\item \textbf{Đầu vào:} Ảnh MRI não dạng 2D hoặc 3D, đa chuỗi (T1, T1CE, T2, FLAIR)
+\item \textbf{Đầu ra:} Bản đồ phân đoạn gồm ET, TC, WT
+\item \textbf{Mục tiêu:}
+\begin{itemize}
+\item Xác định chính xác ranh giới u
+\item Giảm phụ thuộc vào vẽ nhãn thủ công (tốn thời gian \& mang tính chủ quan)
+\item Hỗ trợ lập kế hoạch điều trị và tiên lượng bệnh
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\section{Dữ liệu}
+\begin{frame}{Bộ dữ liệu}
+\small
+\ding{113}~ \textbf{BraTS2020:}
+\begin{itemize}
+\item Bộ dữ liệu chuẩn cho bài toán phân đoạn u não trên MRI đa chuỗi.
+\item Bao gồm ảnh MRI trước phẫu thuật của bệnh nhân glioma từ nhiều trung tâm lâm sàng
+\end{itemize}
+\ding{113}~ \textbf{Quy mô dữ liệu:}
+\begin{itemize}
+\item 369 ca có nhãn, 125 ca không nhãn
+\item Mỗi ca chứa 4 chuỗi MRI
+\item Với tập có nhãn đi kèm bản đồ phân đoạn được gán nhãn thủ công bởi chuyên gia
+\end{itemize}
+\ding{113}~ \textbf{Cấu trúc nhãn:} 0 -- Background, 1 -– NCR/NET, 2 –- ED, 4 –- ET\\
+\ding{113}~ \textbf{Các bước tiền xử lý đã có trong dataset:}
+\begin{itemize}
+\item Loại bỏ hộp sọ, chuẩn hóa không gian
+\item Resample về độ phân giải $1\times1\times1$ mm$^3$; chuẩn hóa kích thước về $240 \times240\times155$ voxel
+\end{itemize}
+Tất cả dữ liệu lưu dưới định dạng NIfTI (\code{.nii.gz}).
+\end{frame}
+\subsection{Tiền xử lý}
+\begin{frame}{Tiền xử lý dữ liệu 2D \& tách lát cắt}
+\begin{enumerate}
+\item[\blue{\ding{182}}] Xác định bounding box 2D vuông chứa toàn bộ vùng não trên mặt phẳng $(x, y)$
+\item[\blue{\ding{183}}] Cuẩn hóa cường độ bằng percentile\\
+Tính 1-percentile và 99-percentile $\to$ cắt ngưỡng $\to$ chuẩn hóa về [0, 1].
+\item[\blue{\ding{184}}] Cắt thành các lát cắt $\to$ crop $\to$ resize về $256 \times 256$.\\
+Ảnh MRI dùng interpolation tuyến tính, mask dùng nearest neighbor.
+\item[\blue{\ding{185}}] Ánh xạ nhãn $4$ $\to$ 3
+\end{enumerate}
+\end{frame}
+\begin{frame}{Tiền xử lý dữ liệu 3D}
+\begin{enumerate}
+\item[\blue{\ding{182}}] Crop thể tích MRI bằng bounding box đã xác định trước đó, giữ nguyên chiều sâu.
+\item[\blue{\ding{183}}] Chuẩn hóa cường độ voxel theo Z-score
+\item[\blue{\ding{184}}] Ánh xạ nhãn $4 \to 3$ 
+\end{enumerate}
+\end{frame}
+\subsection{Thống kê \& phân tích dữ liệu}
+\begin{frame}{Phân bố thể tích các vùng u của nhóm HGG}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"images/Nhóm HGG"}
+\label{fig:nhom-hgg}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Phân bố thể tích các vùng u của nhóm LGG}
+\begin{figure}[H]
+\centering
+\label{fig:nhom-lgg}
+\includegraphics[width=0.9\linewidth]{"images/Nhóm LGG"}
+\end{figure}
+\end{frame}
+
+\begin{frame}{So sánh 2 nhóm HGG vs LGG}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"images/So sánh HGG vs LGG"}
+\label{fig:so-sanh-hgg-vs-lgg}
+\end{figure}
+$\Rightarrow$ \textbf{Nhận xét}
+\end{frame}
+
+\begin{frame}{Tương quan giữa các modality trong vùng khối u}
+\begin{columns}[t]  % t = căn top, c = center, b = bottom
+
+    \begin{column}{0.55\textwidth}
+        \begin{itemize}
+        \item T1 và T1ce có tương quan mạnh $(r = 0.61)$
+        \begin{itemize}
+        \item T1ce là phiên bản T1 có tiêm gadolinium $\to$ tăng tín hiệu ở vùng tăng sinh ET
+        \item Mức tương quan cao nhưng không trùng lặp hoàn toàn
+        \end{itemize}
+        \item Flair có tương quan thấp với các chuỗi còn lại\\
+        Phản ánh đặc tính sinh lý khác biệt:
+        \begin{itemize}
+        \item Flair nhạy với vùng phù quanh u ED
+        \item T1ce, T1 nhạy với cấu trúc/tăng sinh mạch
+        \end{itemize}
+        $\to$ Flair bổ sung quan trọng cho mô tả ranh giới toàn bộ khối u WT.
+        \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+        \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{"images/Tương quan giữa các modality trong vùng khối u"}
+        \label{fig:tuong-quan-giua-cac-modality-trong-vung-khoi-u}
+        \end{figure}
+        
+    \end{column}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}{Phân chia dữ liệu}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{"images/Phân chia dữ liệu"}
+\label{fig:phan-chia-du-lieu}
+\end{figure}
+\textbf{Phân tầng dự trên 3 yếu tố:}
+\begin{itemize}
+\item Độ ác tính: HGG, LGG
+\item Sự hiện diện của vùng ET
+\item Kích thước khối u: phân nhóm theo quantile.
+\end{itemize}
+$\Rightarrow$ Giúp duy trì phân bố đặc trưng đồng đều
+
+\end{frame}
+
+\section{Phương pháp}
+\subsection{Quy trình tổng quan}
+\begin{frame}{Quy trình tổng quan}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{"images/Quy trình tổng quan"}
+\label{fig:quy-trinh-tong-quan}
+\end{figure}
+\end{frame}
+
+
+\subsection{UNet}
+
+\begin{frame}{UNet}
+\begin{columns}[t]  % t = căn top, c = center, b = bottom
+
+    \begin{column}{0.55\textwidth}
+        Các mô hình phân đoạn hiện đại thường dựa trên kiến trúc encoder-decoder, tiêu biểu là UNet.
+        \begin{itemize}
+        		\item Nhánh encoder: trích xuất đặc trưng + giảm dần độ phân giải không gian 
+        		\item Nhánh decoder: khôi phục lại độ phân giải ban đầu.
+        		\end{itemize}
+        \begin{tcolorbox}[colback=customcolback,colframe=customcolframe,title=\textbf{Skip connection}]
+        		Kết nối đặc trưng có độ phân giải cao, mức độ trừu tượng thấp từ encoder sang các đặc trưng có mức độ trừu tượng cao hơn từ decoder.
+        	
+        	\end{tcolorbox}
+    \end{column}
+
+    \begin{column}{0.45\textwidth}
+		\begin{figure}[H]
+		\centering
+		\label{fig:kien-truc-unet1}
+		\includegraphics[width=1.05\linewidth]{"images/Kiến trúc UNet1"}
+		\end{figure}
+    \end{column}
+
+\end{columns}
+\end{frame}
+\subsection{UNet++}
+\begin{frame}{UNet++}
+\textbf{Skip connection nguyên bản của UNet:} nối trực tiếp feature từ encoder sang decoder dù 2 loại feature này có mức độ trừu tượng rất khác nhau $\to$ mô hình học khó hơn.\\
+\vspace{1cm}
+\textbf{UNet++ (2018) ra đời giải quyết vấn đề đó bằng việc:}
+\begin{itemize}
+\item Thiết kế lại các skip connections
+\item Deep supervision
+\item Cho phép pruning linh hoạt.
+\end{itemize}
+\end{frame}
+\begin{frame}{Skip connections được thiết kế trong UNet++}
+\textbf{UNet++ không nổi thẳng encoder với decoder nữa!}
+\begin{columns}[c]  % t = căn top, c = center, b = bottom
+
+    \begin{column}{0.48\textwidth}
+    \begin{itemize}
+    \item Mỗi đường skip sẽ trải qua một chuỗi các khối \textbf{dense convolution}: nối tất cả các đầu vào trước đó + feature được upsample từ tầng sâu hơn.\\
+    $\Rightarrow$ Nâng dần mức ngữ nghĩa của feature encoder để tiệm cận decoder trước khi ghép vào nhau $\to$ \textit{mạng học dễ dàng hơn, kết quả phân đoạn chi tiết hơn.}
+    \end{itemize}
+    Mỗi node skip càng sâu thì càng giàu thông tin và tiệm cận decoder.
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+    	\vspace{-0.3cm}
+		\begin{figure}[H]
+		\centering
+		\label{fig:kien-truc-unet3}
+		\includegraphics[width=1\linewidth]{"images/Kiến trúc UNet++3"}
+		\end{figure}
+        
+    \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Deep Supervision}
+\begin{columns}[t]  % t = căn top, c = center, b = bottom
+	
+    \begin{column}{0.58\textwidth}
+    Mục đích của Deep supervision:
+    \begin{itemize}
+    \item Giúp gradient lan truyền trực tiếp vào các tầng giữa $\to$ huấn luyện nhanh và ổn định hơn 
+    \item Cho phép lựa chọn nhiều đầu ra phân đoạn tương ứng với các độ sâu khác nhau
+    \end{itemize}
+    2 chế đô:
+    \begin{itemize}
+    \item \textbf{Accurate mode:} Dùng tất cả các nhánh phân đoạn, tổng hợp hoặc lấy trung bình $\to$ kết quả chính xác nhất.
+    \item \textbf{Fast mode:} 
+    \begin{itemize}
+    \item Chỉ chọn 1 nhánh $L^1, L^2$ hoặc $L^3$ để inference
+    \item Các nhánh còn lại có thể cắt bỏ (prune)
+    \end{itemize}
+    $\to$ Cắt ngắn mô hình để giảm thời gian inference mà không phải huấn luyện lại từ đầu.
+    \end{itemize}   
+    \end{column}
+
+    \begin{column}{0.40\textwidth}
+    	\vspace{-0.4cm}
+       \begin{figure}[H]
+       \centering
+       \includegraphics[width=0.68\linewidth]{"images/Deep supervision trong UNet++"}
+       \label{fig:deep-supervision-trong-unet}
+       \end{figure}
+    \end{column}
+
+\end{columns}
+\end{frame}
+
+\subsection{VNet}
+\begin{frame}{VNet}
+VNet (2016) được thiết kế như một mạng fully convolution 3D dành riêng cho bài toán phân đoạn thể tích trong ảnh y khoa.
+\begin{itemize}
+\item VNet học trực tiếp trên toàn bộ thể tích MRI và sinh ra mask phân đoạn 3D cùng kích thước $\to$ cho phép mô hình nắm bắt trọn vẹn ngữ cảnh không gian theo ba chiều.
+\item Kiến trúc được xây dựng theo dạng encoder-decoder 3D với các khối residual và cơ chế downsample, upsample sử dụng tích chập 3D.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{VNet}
+
+\begin{columns}[t]  % t = căn top, c = center, b = bottom
+
+    \begin{column}{0.40\textwidth}
+      Mỗi stage của VNet:
+      \begin{itemize}
+      \item Sử dụng 1-3 lớp tích chập 3D với kernel $5 \times 5 \times 5$ kết hợp với hàm kích hoạt \textbf{PReLU} thay vì ReLU.
+      \item Được xây dựng theo dạng \textbf{residual block}.
+      \end{itemize}
+      Lợi ích của residual:
+      \begin{itemize}
+      \item Giúp mạng sâu dễ huấn luyện hơn
+      \item Tránh gradient vanishing
+      \item Tăng tốc độ hội tụ và cải thiện chất lượng phân đoạn.
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.6\textwidth}
+    \vspace{-0.5cm}
+        \begin{figure}[H]
+        \centering
+        \includegraphics[width=1.03\linewidth]{"images/Kiến trúc VNet1"}
+        \label{fig:kien-truc-vnet1}
+        \end{figure}
+
+    \end{column}
+
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Cơ chế Downsample bằng tích chập 3D}
+Thay vì sử dụng max-pooling, VNet giảm độ phân giải bằng:
+\begin{itemize}
+\item 1 lớp convolution 3D với kernel $2 \times 2 \times 2$, stride = 2.
+\item Giảm một nửa kích thước không gian
+\item Tăng gấp đôi số kênh
+\end{itemize}
+$\Rightarrow$ \textbf{Ưu điểm so với pooling:} ...
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{images/VNet-downsample}
+\label{fig:vnet-downsample}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Cơ chế Upsample bằng deconvolution 3D}
+Nhánh decoder của VNet khôi phục kích thước không gian bằng:
+\begin{itemize}
+\item 3D transposed convolution kernel $2 \times 2 \times 2$, stride = 2
+\item Tăng độ phân giải lên gấp đôi
+\item Giảm số kênh đi một nửa.
+\end{itemize}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\linewidth]{images/VNet-upsample}
+\label{fig:vnet-upsample}
+\end{figure}
+\end{frame}
+
+\subsection{Swin UNet3D}
+\begin{frame}{Swin UNet3D}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{"images/Tổng quan kiến trúc Swin UNet3D"}
+\label{fig:tong-quan-kien-truc-swin-unet3d}
+\end{figure}
+\end{frame}
+\begin{frame}{Các module cốt lõi của Swin SwinUNet3D}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{"images/Các module cốt lõi của Swin UNet3D"}
+\label{fig:cac-module-cot-loi-cua-swin-unet3d}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Window attention 3D}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{"images/Window attention 3D"}
+\label{fig:window-attention-3d}
+\end{figure}
+
+\end{frame}
+
+
+\section{Thực nghiệm}
+\subsection{Các độ đo đánh giá}
+\begin{frame}{Các độ đo đánh giá}
+Đánh giá chất lượng phân đoạn trên các vùng WT, TC, ET thông qua:
+\begin{itemize}
+\item \textbf{Dice, IoU}\\
+Đánh giá độ trùng khớp giữa vùng dự đoán $P$ và vùng nhãn thực $G$.
+\item \textbf{Average Surface Distance (ASD)}\\
+Đo khoảng cách trung bình giữa bề mặt dự đoán $S_P$ và bề mặt nhãn thực $S_G$
+\item \textbf{HD95}\\
+Đo mức  sai lệch biên lớn nhất ở 95\% điểm biên.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\linewidth]{images/HD}
+\label{fig:hd}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\subsection{Các thử nghiệm thực hiện}
+\begin{frame}{Thử nghiệm}
+
+\begin{columns}[t]  % t = căn top, c = center, b = bottom
+
+    \begin{column}{0.48\textwidth}
+    Giữa kì:
+        \begin{enumerate}
+        \item Huấn luyện UNet trên các lát cắt 2D
+        \item Huấn luyện Unet++ trên các lát cắt 2D.
+        \item Huấn luyện VNet/VNet multi-head/VNet multi-encoder trên toàn bộ thể tích 3D/ các patch 3D.
+        \end{enumerate}
+     Cuối kì:
+     \begin{enumerate}
+     \item Huấn luyện Swin UNet3D trên các patch 3D.
+     \end{enumerate}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+    \textit{Toàn bộ thể tích và 1 patch của ca chụp 101}
+        \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{"images/Toàn bộ thể tích và 1 patch của ca chụp 101"}
+        \label{fig:toan-bo-the-tich-va-1-patch-cua-ca-chup-101}
+        \end{figure}
+        
+    \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Quá trình inference}
+Một số thử nghiệm mô hình theo hướng patch-based khi inference sẽ sử dụng sliding window trên toàn bộ thể tích 3D để tạo ra dự đoán cuối cùng:
+\begin{itemize}
+\item Patch:  $128 \times 128 \times 128$
+\item Stride: $20 \times 20 \times 20$
+\item Các vùng chồng lấn được hợp nhất bằng trung bình softmax (probability average)
+\item Dự đoán cuối cùng lấy argmax theo kênh.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Huấn luyện VNet trên các patch 3D sử dụng DiceLoss}
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{"images/Learning curbs VNet patch Diceloss"}
+\label{fig:learning-curbs-vnet-patch-diceloss}
+\end{figure}
+\end{frame}
+
+\section{Kết quả}
+\begin{frame}{Kết quả UNet}
+\begin{table}[H]
+\centering
+\begin{tabular}{
+    >{\raggedright\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+}
+\hline
+\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD (mm)} & \textbf{HD95 (mm)} \\
+\hline
+WT & \textbf{0.8612} & 0.7725 & 3.6368 & 19.0979 \\
+TC & \textbf{0.7549} & 0.6570 & 4.6777 & 12.5280 \\
+ET & \textbf{0.7148} & 0.5992 & 9.1472 & 18.2997 \\
+\hline
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Kết quả UNet++}
+\begin{table}[H]
+\centering
+\begin{tabular}{
+    >{\raggedright\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+}
+\hline
+\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+\hline
+WT & 0.8954 & 0.8158 & 1.5725 & 5.0218 \\
+TC & 0.8196 & 0.7297 & 2.0064 & 6.2421 \\
+ET & 0.7360 & 0.6278 & 1.6917 & 5.0079 \\
+\hline
+\end{tabular}
+\end{table}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{"images/Visualize kết quả UNet++"}
+\caption{Kết quả phân đoạn của UNet++ trên lát cắt thứ 75 của ca chụp 011}
+\label{fig:visualize-ket-qua-unet}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Kết quả VNet}
+\begin{itemize}
+\item \textbf{VNet huấn luyện trên toàn bộ thể tích 3D:}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{
+	    >{\raggedright\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	}
+		\hline
+		\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+		\hline
+		WT & 0.8501 & 0.7706 & 1.5178 & 5.8878 \\
+		TC & 0.7949 & 0.7068 & 2.2944 & 7.5172 \\
+		ET & 0.7265 & 0.6219 & 1.7098 & 5.1759 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\item \textbf{VNet huấn luyện trên các patch 3D - \magenta{DiceCELoss} }
+\begin{table}[H]
+	\centering
+	\begin{tabular}{
+		    >{\raggedright\arraybackslash}p{2cm}
+		    >{\centering\arraybackslash}p{2cm}
+		    >{\centering\arraybackslash}p{2cm}
+		    >{\centering\arraybackslash}p{2cm}
+		    >{\centering\arraybackslash}p{2cm}
+		}
+		\hline
+		\textbf{Region} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+		\hline
+		WT & 0.8977 & 0.8236 & 3.1626 & 10.1072 \\
+		TC & 0.8353 & 0.7464 & 3.5748 & 9.3785 \\
+		ET & 0.7519 & 0.6556 & 3.4380 & 7.8940 \\
+		\hline
+	\end{tabular}
+\end{table}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Kết quả VNet}
+\begin{itemize}
+\item \textbf{VNet huấn luyện trên các patch 3D - \magenta{DiceLoss}}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{
+			    >{\raggedright\arraybackslash}p{2cm}
+			    >{\centering\arraybackslash}p{2cm}
+			    >{\centering\arraybackslash}p{2cm}
+			    >{\centering\arraybackslash}p{2cm}
+			    >{\centering\arraybackslash}p{2cm}
+			}
+		\hline
+		\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+		\hline
+		WT & 0.9024 & 0.8236 & 2.0219 & 6.9727 \\
+		TC & 0.8633 & 0.7664 & 1.6688 & 5.5709 \\
+		ET & 0.7617 & 0.6650 & 1.6565 & 5.3642 \\
+		\hline
+	\end{tabular}
+\end{table}
+\item \textbf{\blue{VNet Multi-head} huấn luyện trên các patch 3D}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{
+				    >{\raggedright\arraybackslash}p{2cm}
+				    >{\centering\arraybackslash}p{2cm}
+				    >{\centering\arraybackslash}p{2cm}
+				    >{\centering\arraybackslash}p{2cm}
+				    >{\centering\arraybackslash}p{2cm}
+				}
+		\hline
+		\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+		\hline
+		WT  & 0.8944 & 0.8195 & 2.4352 & 7.7570 \\
+		TC  & 0.8315 & 0.7416 & 2.7558 & 8.2220 \\
+		ET  & 0.7680 & 0.6703 & 1.5727 & 5.2660 \\
+		\hline
+	\end{tabular}
+\end{table}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Kết quả VNet}
+\begin{itemize}
+\item \textbf{\blue{VNet Multi-encoder} huấn luyện trên các patch 3D}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{
+	    >{\raggedright\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+		}
+		\hline
+		\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+		\hline
+		WT  & 0.9011 & 0.8300 & 2.8607 & 8.6980 \\
+		TC  & 0.8499 & 0.7706 & 2.8147 & 6.6950 \\
+		ET  & 0.7498 & 0.6599 & 2.8145 & 6.5197 \\
+		\hline
+	\end{tabular}
+\end{table}
+\end{itemize}
+\end{frame}
+\begin{frame}{Kết quả VNet}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{"images/Toàn bộ kết quả thử nghiệm với VNet"}
+\label{fig:toan-bo-ket-qua-thu-nghiem-voi-vnet}
+\end{figure}
+$\Rightarrow$ VNet huấn luyện trên các patch 3D sử dụng \magenta{DiceLoss} đạt hiệu suất cao nhất trên tất cả thử nghiệm đã thực hiện.
+\end{frame}
+\begin{frame}{Kết quả VNet}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{"images/Kết quả VNet"}
+\caption{Kết quả phân đoạn của VNet trên lát cắt thứ 75 của ca chụp 011}
+\label{fig:ket-qua-vnet}
+\end{figure}
+\end{frame}
+\begin{frame}{Kết quả VNet}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\linewidth]{"images/Kết quả VNet4"}
+\caption{Dựng mesh 3D bằng marching cubes kết quả phân đoạn trên ca chụp 053 và 193}
+\label{fig:ket-qua-vnet4}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Kết quả Swin UNet3D}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{
+	    >{\raggedright\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+	    >{\centering\arraybackslash}p{2cm}
+		}
+		\hline
+		\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+		\hline
+		WT  & 0.9108 & 0.8351 & 1.0635 & 5.5856 \\
+		TC  & 0.8446 & 0.7639 & 1.5692 & 5.3643 \\
+		ET  & 0.8084 & 0.7091 & 1.1882 & 4.2647 \\
+		\hline
+	\end{tabular}
+\end{table}
+\end{frame}
+\begin{frame}{Kết quả Swin UNet3D}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"images/Trường hợp Swin UNet3D dự đoán tốt và dự đoán tệ"}
+\label{fig:truong-hop-swin-unet3d-du-oan-tot-va-du-oan-te}
+\end{figure}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+%------------------ Lời cảm ơn ------------------
+\begin{comment}
+\begin{frame}[plain]
+  \centering
+  \Large\textbf{Cảm ơn thầy cô và các bạn đã lắng nghe!}
+\end{frame}
+\end{comment}
+
+\end{document}

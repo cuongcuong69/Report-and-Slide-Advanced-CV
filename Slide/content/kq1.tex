@@ -1,0 +1,310 @@
+\section{Thực nghiệm và kết quả}
+\begin{frame}{Thiết kế thực nghiệm và đánh giá}
+\textbf{Mục tiêu đánh giá và các độ đo sử dụng:}
+\begin{itemize}
+    \item Khả năng phát hiện u: accuracy, F1-score
+    \item Khả năng phân đoạn chính xác khối u: hệ số Dice và IoU
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.4\linewidth]{images/dice và iou.png}
+    \end{figure}
+\end{itemize}
+\vspace{0.3cm}
+\textbf{Chiến lược thực nghiệm:}
+\begin{enumerate}
+    \item \textbf{Huấn luyện trực tiếp mô hình phân đoạn u với toàn bộ dữ liệu} 
+    \item \textbf{Huấn luyện 3 bài toán con trong pipeline và đánh giá pha suy luận}
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Kết quả huấn luyện trực tiếp mô hình phân đoạn u}
+\vspace{0.2cm}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{6pt} % Tăng padding giữa các cột
+\scriptsize
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\textbf{Threshold} & \textbf{TP} & \textbf{FP} & \textbf{TN} & \textbf{FN} & \textbf{Acc} & \textbf{F1} & \textbf{DSC all} & \textbf{DSC (tumor)} & \textbf{IoU all} & \textbf{IoU (tumor)} \\
+\hline
+0.4 & 554 & 278 & 3358 & 295 & 0.8724 & 0.6595 & 0.8167 & 0.3588 & 0.8029 & 0.2825 \\
+
+\textbf{0.5} & \textbf{530} & \textbf{225} & \textbf{3411} & \textbf{318} & \textbf{0.8789} & \textbf{0.6613} & \textbf{0.8247} & \textbf{0.3384} & \textbf{0.8115} & \textbf{0.2687} \\
+\rowcolor{red!50}
+0.6 & 501 & 174 & 3462 & 347 & 0.8838 & 0.6579 & 0.8318 & 0.3160 & 0.8193 & 0.2499 \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\linewidth]{images/Huấn luyện trực tiếp - tệ.png}
+    \caption*{\scriptsize Ví dụ lát cắt có u nhưng mô hình dự đoán sai hoàn toàn (Dice = 0.00)}
+\end{figure}
+
+\end{frame}
+
+\begin{comment}
+\begin{frame}{Kết quả 3 bài toán con}
+\textbf{Bài toán 1: Phân đoạn vùng phổi (U-Net)}
+\begin{itemize}
+    \item Threshold tốt nhất: \textbf{0.6}
+    \item Accuracy: \textbf{88.91\%}, hệ số Dice trên các lát cắt có phổi: \textbf{0.93}
+    \item Vấn đề: Một số lát rìa chuỗi CT có phổi mờ → Dice thấp
+    \item Đa số không chứa u → không ảnh hưởng hiệu suất của mô hình tổng thể 
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Bài toán 2: Phân loại lát có/không có u (ResNet50)}
+\begin{itemize}
+    \item Threshold tốt nhất: 0.6
+    \item Accuracy: 0.88, F1-score: 0.73, False Positive: 158, False Negative: 274
+    \item Để giảm khả năng bỏ sót những lát cắt có u trong giai đoạn suy luận, tiến hành hậu xử lý nếu 1 lát cắt được dự đoán có u thì 8 lát cắt lân cận cũng được gán nhãn là có u.
+    \item False Positive tăng lên 884, False Negative giảm xuống chỉ còn 47.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Kết quả 3 bài toán con}
+\textbf{Bài toán 3: Phân đoạn u (TransUnet)}
+\begin{itemize}
+    \item Threshold tốt nhất: \textbf{0.4}
+    \item Hệ số dice trên toàn bộ tập test: \textbf{0.6543}, IoU: \textbf{0.6071}
+    \item F1: 0.7856
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Áp dụng thêm Test - Time Augmentation: } xoay ảnh 20-50 lần, mô hình dự đoán và lấy trung bình
+\begin{itemize}
+    \item Ngưỡng tốt nhất là 0.4 với số lần xoay là 20
+    \begin{itemize}
+        \item Hệ số Dice trên toàn bộ tập test: \textbf{0.6883}
+        \item Hệ số IoU trên toàn bộ tập test: \textbf{0.6457}
+        \item F1: \textbf{0.7922}
+        \item False Positive: 82, False Negative: 238
+    \end{itemize}
+\end{itemize}
+\end{frame}
+\end{comment}
+\begin{frame}{Hiệu suất tổng thể pipeline}
+
+\vspace{-0.2cm}
+\begin{columns}
+    \begin{column}{0.52\textwidth}
+        \textbf{Cấu hình mô hình sử dụng:}
+        \begin{itemize}
+            \item \textbf{Phân đoạn phổi:} threshold = \textbf{0.6}
+            \item \textbf{Phân loại lát cắt có u:} threshold = \textbf{0.6} + hậu xử lý (8 lát cận kề)
+            \item \textbf{Phân đoạn u:} threshold = \textbf{0.4} + TTA (20 lần xoay)
+        \end{itemize}
+
+        \vspace{0.2cm}
+        \textbf{Thống kê:}
+        \begin{itemize}
+            \item \textbf{Lát cắt chứa phổi:} 3.751 / 4.484
+            \item \textbf{Lát cắt nghi ngờ có u (sau hậu xử lí):} 1.302
+            \item \textbf{Lát cắt phân đoạn ra có u:} 791
+        \end{itemize}
+    \end{column}
+
+    \begin{column}{0.44\textwidth}
+        \textbf{Hiệu suất tổng thể:}
+        \vspace{0.2cm}
+
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabular}{|l|c|}
+            \hline
+            \textbf{Độ đo} & \textbf{Giá trị} \\
+            \hline
+            Accuracy & \textbf{0.9123} \\
+            F1 Score & \textbf{0.7602} \\
+            Dice (toàn bộ) & \textbf{0.8672} \\
+            Dice (có u) & \textbf{0.5011} \\
+            IoU (toàn bộ) & \textbf{0.8516} \\
+            IoU (có u) & \textbf{0.4074} \\
+            FP + FN & \textbf{393} \\
+            \hline
+        \end{tabular}
+    \end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{So sánh hiệu quả pipeline vs huấn luyện trực tiếp}
+
+
+\vspace{0.2cm}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            bar width=14pt,
+            width=15cm,
+            height=5cm,
+            enlarge x limits=0.2, % ⬅ Dãn ra 2 bên
+            ylabel={Giá trị},
+            symbolic x coords={
+                Accuracy, F1, Dice-All, Dice-Tumor, IoU-All, IoU-Tumor
+            },
+            xtick=data,
+            xticklabel style={font=\small},
+            nodes near coords,
+            nodes near coords align={vertical},
+            legend style={
+                at={(0.97,0.97)}, anchor=north east,
+                font=\footnotesize,
+                fill=white, draw=black
+            },
+            ymin=0, ymax=1,
+            ymajorgrids=true,
+        ]
+        \addplot+[style={fill=blue!40},
+        bar shift=-10pt
+        ] coordinates {
+            (Accuracy,0.8838)
+            (F1,0.6579)
+            (Dice-All,0.8318)
+            (Dice-Tumor,0.3160)
+            (IoU-All,0.8193)
+            (IoU-Tumor,0.2499)
+        };
+        \addplot+[style={fill=orange!70},
+        bar shift=+10pt
+        ] coordinates {
+            (Accuracy,0.9123)
+            (F1,0.7602)
+            (Dice-All,0.8672)
+            (Dice-Tumor,0.5011)
+            (IoU-All,0.8516)
+            (IoU-Tumor,0.4074)
+        };
+        \legend{Trực tiếp, Pipeline 3 bước}
+        \end{axis}
+    \end{tikzpicture}
+\end{figure}
+
+\begin{center}
+    \textit{\small Pipeline 3 bước giúp giảm đáng kể tổng số lỗi \textbf{False Positive + False Negative} từ \textbf{521 (174 + 347)} còn \textbf{393 (168 + 225)}, tương ứng giảm hơn \textbf{24\%} so với huấn luyện trực tiếp.}
+\end{center}
+\end{frame}
+
+\begin{frame}{Minh họa cải thiện từ pipeline ba bước}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\linewidth]{images/tốt này xấu kia.png}
+\end{figure}
+
+
+
+\end{frame}
+
+
+
+
+\begin{comment}
+\begin{frame}{So sánh độ chính xác giữa hai phương pháp}
+\begin{columns}
+    \begin{column}{0.55\textwidth}
+        \textbf{\faVial~Đánh giá theo Dice Score (DSC):}
+        \begin{itemize}
+            \item[\faArrowRight] Huấn luyện trực tiếp:
+            \begin{itemize}
+                \item Dice trung bình: \textbf{0.746}
+                \item Mất ổn định trên lát cắt không rõ ràng
+            \end{itemize}
+            \item[\faArrowRight] Pipeline 3 bước:
+            \begin{itemize}
+                \item Dice trung bình: \textbf{0.812}
+                \item Ổn định hơn, bỏ qua lát cắt không chứa phổi
+            \end{itemize}
+        \end{itemize}
+
+        \vspace{0.5em}
+        \textbf{\faCheckDouble~Kết luận:} Pipeline 3 bước cải thiện kết quả phân đoạn rõ rệt
+    \end{column}
+    \begin{column}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{anh/ss2pp.jpg}
+        \vspace{0.6em}
+        
+    \end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{So sánh với các mô hình khác}
+
+\textbf{\faChartBar~So sánh định lượng:}
+
+\vspace{0.5em}
+Để đánh giá hiệu quả của pipeline đề xuất một cách toàn diện, chúng tôi tiến hành so sánh với các kết quả định lượng từ những nghiên cứu trước đã được công bố.
+
+\vspace{0.8em}
+\begin{itemize}
+    \item[\faBook] Bài báo \textbf{[1]}: Recurrent3D-DenseUNet đạt hệ số Dice cao nhất là \textbf{0.7228}, với \textbf{321 FP} và \textbf{331 FN}.
+    \item[\faBook] Bài báo \textbf{[2]}: Deeply Supervised MultiResUnet đạt Dice \textbf{0.8472}, \textbf{123 FP} và \textbf{343 FN}.
+    \item[\faTrophy] \textbf{Pipeline đề xuất} đạt \textbf{Dice 0.8672}, chỉ \textbf{168 FP} và \textbf{225 FN}.
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{\faCheckCircle~Nhận xét:} Pipeline ba bước của chúng tôi vượt trội về độ chính xác phân đoạn, đặc biệt giảm số lượng FN — yếu tố quan trọng giúp giảm nguy cơ bỏ sót khối u thật trong thực hành lâm sàng.
+
+\end{frame}
+\end{comment}
+
+\begin{frame}{Bảng so sánh kết quả với các phương pháp khác}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            bar width=14pt,
+            width=15cm,
+            height=6cm,
+            enlarge x limits=0.2,
+            ylabel={Giá trị},
+            symbolic x coords={Dice, FP, FN},
+            xtick=data,
+            xticklabel style={font=\small},
+            nodes near coords,
+            nodes near coords align={vertical},
+            legend style={
+                at={(0.28,0.98)},
+                anchor=north east,
+                font=\footnotesize,
+                fill=white, draw=black
+            },
+            ymin=0, ymax=400,
+            ymajorgrids=true,
+        ]
+        % Recurrent3D-DenseUNet
+        \addplot+[style={fill=blue!40}, bar shift=-26pt] coordinates {
+            (Dice,72.28)
+            (FP,321)
+            (FN,331)
+        };
+        % Deeply Supervised MultiResUnet
+        \addplot+[style={fill=green!60}, bar shift=0pt] coordinates {
+            (Dice,84.72)
+            (FP,123)
+            (FN,343)
+        };
+        % Pipeline đề xuất
+        \addplot+[style={fill=orange!70}, bar shift=26pt] coordinates {
+            (Dice,86.72)
+            (FP,168)
+            (FN,225)
+        };
+        \legend{Recurrent3D-DenseUNet, MultiResUnet, Pipeline đề xuất}
+        \end{axis}
+    \end{tikzpicture}
+
+\end{figure}
+
+\begin{center}
+    \textit{\small Pipeline 3 bước đạt Dice cao nhất \textbf{(86.72\%)} và đồng thời giúp giảm lỗi \textbf{FN} đáng kể so với các phương pháp trước đó.}
+\end{center}
+
+\end{frame}

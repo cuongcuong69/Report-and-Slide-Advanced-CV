@@ -1,0 +1,36 @@
+\contentsline {chapter}{\numberline {1}Giới thiệu bài toán}{1}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Bộ dữ liệu}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}BraTS2020}{4}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Tiền xử lý dữ liệu}{5}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Tiền xử lý dữ liệu 2D và tách lát cắt}{5}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Tiền xử lý dữ liệu 3D}{6}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Thống kê và phân tích bộ dữ liệu}{7}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Phân tích phân bố thể tích của các vùng khối u (WT, TC, ET)}{7}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}So sánh đặc trưng tín hiệu giữa các modality MRI}{10}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Phân chia tập dữ liệu}{11}{section.2.4}%
+\contentsline {chapter}{\numberline {3}Phương pháp}{13}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Quy trình tổng quan}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}UNet}{13}{section.3.2}%
+\contentsline {section}{\numberline {3.3}UNet++}{16}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Skip connections được thiết kế lại trong UNet++}{16}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Deep Supervision trong UNet++}{17}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}V-Net}{18}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}UNETR}{21}{subsection.3.4.1}%
+\contentsline {section}{\numberline {3.5}Swin UNet3D}{23}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Tổng quan kiến trúc}{24}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Biểu diễn đầu vào theo voxel patch và token}{25}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Thiết kế theo stage: DownStage và Upstage}{25}{subsection.3.5.3}%
+\contentsline {section}{\numberline {3.6}Hàm mất mát}{26}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}Dice loss cho phân đoạn đa lớp}{26}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Hàm mất mát kết hợp Dice + Cross-Entropy}{27}{subsection.3.6.2}%
+\contentsline {chapter}{\numberline {4}Thực nghiệm}{28}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Các độ đo đánh giá}{28}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Chi tiết triển khai}{29}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Mô hình UNet}{29}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Mô hình UNet++}{30}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Mô hình VNet}{31}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Mô hình UNETR}{36}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Mô hình Swin UNet3D}{37}{subsection.4.2.5}%
+\contentsline {chapter}{\numberline {5}Kết quả và thảo luận}{38}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Kết quả}{38}{section.5.1}%
+\contentsline {section}{\numberline {5.2}So sánh các phương pháp}{47}{section.5.2}%

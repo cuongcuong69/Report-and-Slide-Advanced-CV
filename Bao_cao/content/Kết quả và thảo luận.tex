@@ -1,0 +1,341 @@
+\chapter{Kết quả và thảo luận}
+\section{Kết quả}
+\noindent\ding{113}~ \textbf{Mô hình UNet}\\
+Đối với các mô hình 2D, quá trình suy luận được thực hiện trên từng lát cắt 2D độc lập. Các kết quả phân đoạn trên từng lát cắt sau đó được xếp chồng lại để tái tạo thành ảnh phân đoạn 3D hoàn chỉnh, dựa trên thông tin spacing của dữ liệu đầu vào. Trên cơ sở ảnh phân đoạn 3D thu được, các chỉ số đánh giá như Dice, IoU, ASD và HD95 được tính toán nhằm đảm bảo tính nhất quán và công bằng khi so sánh với các mô hình 3D.
+\begin{table}[H]
+\centering
+\begin{tabular}{
+    >{\raggedright\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+    >{\centering\arraybackslash}p{2cm}
+}
+\hline
+\textbf{ROI} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD (mm)} & \textbf{HD95 (mm)} \\
+\hline
+WT & \textbf{0.8612} & 0.7725 & 3.6368 & 19.0979 \\
+TC & \textbf{0.7549} & 0.6570 & 4.6777 & 12.5280 \\
+ET & \textbf{0.7148} & 0.5992 & 9.1472 & 18.2997 \\
+\hline
+\end{tabular}
+\caption{Kết quả inference mô hình UNet trên tập test}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/UNet2D_Example_Slice_1.png}
+    \label{fig:unet2d-example-slice}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/UNet2D_Example_Slice_2.png}
+    \label{fig:unet2d-example-slice}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/UNet2D_Example_Slice_3.png}
+    \caption{Ví dụ kết quả phân đoạn của UNet 2D trên một lát cắt: ảnh MRI đầu vào, mask ground truth và mask dự đoán cho các vùng WT, TC, ET}
+    \label{fig:unet2d-example-slice}
+\end{figure}
+
+\noindent\ding{113}~ \textbf{Mô hình UNet++}\\
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\hline
+\textbf{Region} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+\hline
+WT & 0.895382 & 0.815754 & 1.572549 & 5.021823 \\
+TC & 0.819587 & 0.729654 & 2.006356 & 6.242132 \\
+ET & 0.736035 & 0.627760 & 1.691734 & 5.007932 \\
+\hline
+\end{tabular}
+\caption{Kết quả inference UNet++ trên tập test}
+\end{table}
+
+- Đánh giá kết quả mô hình theo các vùng (Region):
+
+\begin{itemize}[itemsep= 0.1em, left=2em, parsep=0em, topsep=0.1em]
+    \item \textbf{Vùng WT (Whole Tumor):}
+    \begin{itemize}
+        \item Dice = 0.8954, IoU = 0.8158: mô hình đạt hiệu quả cao trong việc phân đoạn toàn bộ khối u, gần như khớp tốt với ground truth.
+        \item ASD = 1.5725, HD95 = 5.0218: sai số khoảng cách trung bình và sai số cực đại 95\% đều ở mức chấp nhận được, minh chứng cho độ chính xác không gian khá tốt.
+    \end{itemize}
+    
+    \item \textbf{Vùng TC (Tumor Core):}
+    \begin{itemize}
+        \item Dice = 0.8196, IoU = 0.7297: thấp hơn WT, cho thấy việc phân đoạn phần lõi khối u phức tạp hơn nhưng vẫn đạt mức khá tốt.
+        \item ASD = 2.0064, HD95 = 6.2421: giá trị tăng nhẹ so với WT, phản ánh một số sai lệch trong ranh giới phân đoạn, đặc biệt ở các vùng mép lõi.
+    \end{itemize}
+    
+    \item \textbf{Vùng ET (Enhancing Tumor):}
+    \begin{itemize}
+        \item Dice = 0.7360, IoU = 0.6278: thấp nhất trong ba vùng, thể hiện việc dự đoán vùng ET khó khăn nhất, có thể do kích thước nhỏ, hình dạng phức tạp hoặc độ tương phản kém.
+        \item ASD = 1.6917, HD95 = 5.0079: mặc dù sai số trung bình không quá lớn nhưng HD95 vẫn khá cao, chứng tỏ mô hình gặp khó khăn với một số điểm cực đoan trong vùng ET.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Nhận xét tổng quan:} Mô hình đạt hiệu quả tốt nhất trên vùng WT, trung bình khá trên vùng TC, và gặp nhiều khó khăn hơn với vùng ET. Các chỉ số ASD và HD95 cho thấy mô hình phân đoạn khá ổn về mặt hình học, nhưng vẫn có sai số ở các chi tiết nhỏ hoặc ranh giới phức tạp. Đây là xu hướng thường gặp trong phân đoạn khối u não, khi các vùng nhỏ và phức tạp như ET thường khó dự đoán chính xác hơn các vùng lớn như WT.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/vis_unetpp_1.png}
+    \caption{Kết quả dự đoán của mô hình trên lát cắt 88 của ca chụp 90}
+    \label{fig:placeholder}
+\end{figure}
+
+\textbf{Nhận xét:}
+
+Mô hình thể hiện khả năng phân đoạn tốt các vùng chính, đặc biệt là WT và TC, với hình dạng và vị trí gần như trùng khớp Ground Truth. Vùng ET nhỏ và chi tiết phức tạp nên dự đoán có sai số nhẹ, phản ánh xu hướng khó khăn phổ biến trong phân đoạn tự động các vùng khối u não nhỏ. Kết quả này cho thấy mô hình có độ chính xác không gian cao và khả năng định vị chính xác các cấu trúc khối u trên lát cắt 2D FLAIR.
+
+
+\noindent\ding{113}~ \textbf{Mô hình VNet}\\
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.2}
+
+% Thu nhỏ bảng vừa trang
+\resizebox{1.1\textwidth}{!}{
+\begin{tabular}{
+  |>{\raggedright\arraybackslash}p{4.5cm}
+  |*{12}{>{\centering\arraybackslash}p{1.1cm}|}
+}
+\hline
+\multicolumn{1}{|c|}{} 
+ & \multicolumn{4}{c|}{WT}
+ & \multicolumn{4}{c|}{TC}
+ & \multicolumn{4}{c|}{ET}
+\\ \hline
+
+ & Dice & IoU & ASD & HD95 
+ & Dice & IoU & ASD & HD95
+ & Dice & IoU & ASD & HD95
+\\ \hline
+
+VNet trên toàn bộ thể tích
+    & 0.8501 & 0.7706 & 1.5178 & 5.8878
+    & 0.7949 & 0.7068 & 2.2944 & 7.5172
+    & 0.7265 & 0.6219 & 1.7098 & 5.1759
+\\ \hline
+
+VNet trên các patch 3D (DiceCELoss)
+    & 0.8977 & 0.8236 & 3.1626 & 10.1072
+    & 0.8353 & 0.7464 & 3.5748 & 9.3785
+    & 0.7519 & 0.6556 & 3.4380 & 7.8940
+\\ \hline
+
+VNet trên các patch 3D (DiceLoss)
+    & 0.9024 & 0.8236 & 2.0219 & 6.9727
+    & 0.8633 & 0.7664 & 1.6688 & 5.5709
+    & 0.7617 & 0.6650 & 1.6565 & 5.3642
+\\ \hline
+
+VNet Multi-Head trên các patch 3D
+    & 0.8944 & 0.8195 & 2.4352 & 7.7570
+    & 0.8315 & 0.7416 & 2.7558 & 8.2220
+    & 0.7680 & 0.6703 & 1.5727 & 5.2660
+\\ \hline
+
+VNet Multi-encoder trên các khối 3D
+    & 0.9011 & 0.8300 & 2.8607 & 8.6980
+    & 0.8499 & 0.7706 & 2.8147 & 6.6950
+    & 0.7498 & 0.6599 & 2.8145 & 6.5197
+\\ \hline
+
+\end{tabular}
+}
+\caption{Kết quả đánh giá các mô hình VNet trên các vùng WT, TC và ET.}
+\label{tab:vnet_results_traditional}
+\end{table}
+Bảng \ref{tab:vnet_results_traditional} trình bày chi tiết các chỉ số đánh giá trên tập test cho toàn bộ các biến thể của VNet, bao gồm huấn luyện trên toàn bộ thể tích, huấn luyện theo patch 3D với hai lựa chọn hàm mất mát (DiceCE và Dice), cũng như hai biến thể mở rộng là VNet multi-head và VNet multi-encoder.\\
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{img/Biểu đồ kết quả VNet.png}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{img/Biểu đồ kết quả VNet 2.png}
+\end{figure}
+
+Nhìn chung, trong nhóm các biến thể VNet, huấn luyện trên các patch 3D với DiceLoss thuần túy cho kết quả tốt nhất xét trên trung bình ba cấu trúc, trong khi VNet multi-head tỏ ra đặc biệt hiệu quả đối với vùng ET và VNet multi-encoder cải thiện IoU cho WT và TC nhờ khả năng khai thác thông tin từng modality một cách chuyên biệt.
+
+Minh họa kết quả dự đoán của mô hình trên lát cắt $z = 75$ của ca chụp 11 được overlay lên chuỗi Flair:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{img/VNet x = 75 Brain 11.png}
+    \caption{Kết quả phân đoạn của VNet trên lát cắt thứ 75 của ca chụp 11}
+    \label{fig:placeholder}
+\end{figure}
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"img/Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 104 (VNET)"}
+\caption{Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 104}
+\label{fig:ket-qua-dung-mesh-3d-ket-qua-du-oan-va-ground-truth-mau-xanh-la-cua-ca-chup-104-vnet}
+\end{figure}
+Minh họa trường hợp mô hình dự đoán tê:
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"img/Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 193 (VNET)"}
+\caption{Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 193}
+\label{fig:ket-qua-dung-mesh-3d-ket-qua-du-oan-va-ground-truth-mau-xanh-la-cua-ca-chup-193-vnet}
+\end{figure}
+
+
+\noindent\ding{113}~ \textbf{Mô hình UNETR}
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\hline
+\textbf{Region} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+\hline
+WT & 0.8729 & 0.7887 & 3.4713 & 10.5030 \\
+TC & 0.7819 & 0.6777 & 5.2696 & 12.7303 \\
+ET & 0.6869 & 0.5788 & 4.2527 & 12.4837 \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá các mô hình UNETR trên các vùng WT, TC và ET}
+\end{table}
+
+
+- Đánh giá kết quả mô hình:
+\begin{itemize}[itemsep= 0.1em, left=3em, parsep=0em, topsep=0.1em]
+    \item Mô hình đạt hiệu suất tốt nhất trên vùng WT với Dice = 0.8729, cho thấy khả năng phân đoạn toàn bộ khối u một cách chính xác.
+    \item Vùng TC đạt Dice = 0.7819, phản ánh mức độ khó trong việc xác định ranh giới của lõi u.
+    \item Vùng ET có giá trị Dice thấp nhất (0.6869) do đây là vùng nhỏ nhất và khó phân đoạn nhất, một hiện tượng thường gặp trong các mô hình phân đoạn u não.
+    \item Các chỉ số ASD và HD95 cho thấy sai số khoảng cách bề mặt nằm trong phạm vi chấp nhận được, trong đó vùng WT đạt độ chính xác cao nhất với ASD = 3.47\,mm.
+\end{itemize}
+
+Mô hình UNETR đạt hiệu suất khá tốt với Dice trung bình 0.7806 trên ba vùng WT/TC/ET. Điểm mạnh nổi bật là phân đoạn Whole Tumor (Dice = 0.8729) nhờ khả năng học đặc trưng toàn cục của Vision Transformer. Tuy nhiên, vùng Enhancing Tumor còn hạn chế (Dice = 0.6869) do kích thước nhỏ và class imbalance.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{img/UNETR_Brain_091_z088.png}
+    \caption{Kết quả phân đoạn của UNETR trên lát cắt thứ 88 của ca chụp 091}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{img/UNETR_Brain_011_z075.png}
+    \caption{Kết quả phân đoạn của UNETR trên lát cắt thứ 75 của ca chụp 011}
+    \label{fig:placeholder}
+\end{figure}
+
+Từ các hình ảnh trên ta thấy mô hình UNETR phân đoạn rất chính xác cả ba vùng WT, TC và ET trên bệnh nhân 91 và 11, với sự trùng khớp cao giữa prediction và ground truth. Đặc biệt, vùng ET (màu vàng) - thường khó nhất - được xác định tốt ở trung tâm khối u. Kết quả subregions cho thấy mô hình phân biệt rõ ràng ba vùng con NCR/NET (đỏ), ED (xanh lá) và ET (xanh dương).\\
+
+\noindent\ding{113}~ \textbf{Mô hình Swin UNet3D}
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\hline
+\textbf{Region} & \textbf{Dice} & \textbf{IoU} & \textbf{ASD} & \textbf{HD95} \\
+\hline
+WT & 0.9108 & 0.8351 & 1.6035 & 5.5856 \\
+TC & 0.8446 & 0.7639 & 1.5692 & 5.3643 \\
+ET & 0.8084 & 0.7091 & 1.1882 & 4.2647 \\
+\hline
+\end{tabular}
+\caption{Kết quả inference mô hình Swin UNet3D trên tập test}
+\end{table}
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{"img/Kết quả phân đoạn của Swin UNet3D trên lát cắt thứ 75 của ca chụp 011"}
+\caption{Kết quả phân đoạn của Swin UNet3D trên lát cắt thứ 88 của ca chụp 091}
+\label{fig:ket-qua-phan-oan-cua-swin-unet3d-tren-lat-cat-thu-75-cua-ca-chup-011}
+\end{figure}
+
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\linewidth]{"img/Kết quả phân đoạn của Swin UNet3D trên lát cắt thứ 75_1 của ca chụp 011"}
+\caption{Kết quả phân đoạn của Swin UNet3D trên lát cắt thứ 75 của ca chụp 011}
+\label{fig:ket-qua-phan-oan-cua-swin-unet3d-tren-lat-cat-thu-751-cua-ca-chup-011}
+\end{figure}
+Minh họa trường hợp mô hình dự đoán tốt:
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"img/Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 053"}
+\caption{Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 104}
+\label{fig:ket-qua-dung-mesh-3d-ket-qua-du-oan-va-ground-truth-mau-xanh-la-cua-ca-chup-053}
+\end{figure}
+Minh họa trường hợp mô hình dự đoán tệ:
+% TODO: \usepackage{graphicx} required
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{"img/Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 193"}
+\caption{Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 193}
+\label{fig:ket-qua-dung-mesh-3d-ket-qua-du-oan-va-ground-truth-mau-xanh-la-cua-ca-chup-193}
+\end{figure}
+
+
+
+
+\section{So sánh các phương pháp}
+\begin{table}[H]
+\centering
+\caption{So sánh các phương pháp trên ROI WT}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Phương pháp} & \textbf{Dice $\uparrow$} & \textbf{IoU $\uparrow$} & \textbf{ASD $\downarrow$} & \textbf{HD95 $\downarrow$} \\
+\hline
+UNet        & 0.8612 & 0.7725 & 3.6368 & 19.0979 \\
+UNet++      & 0.8954 & 0.8158 & \textbf{1.5725} & \textbf{5.0218} \\
+VNet (3D)   & 0.9024 & 0.8236 & 2.0219 & 6.9727 \\
+UNETR       & 0.8729 & 0.7887 & 3.4713 & 10.5030 \\
+Swin UNet3D & \textbf{0.9108} & \textbf{0.8351} & \textit{1.6035} & \textit{5.5856} \\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\caption{So sánh các phương pháp trên ROI TC}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Phương pháp} & \textbf{Dice $\uparrow$} & \textbf{IoU $\uparrow$} & \textbf{ASD $\downarrow$} & \textbf{HD95 $\downarrow$} \\
+\hline
+UNet        & 0.7549 & 0.6570 & 4.6777 & 12.5280 \\
+UNet++      & 0.8196 & 0.7297 & 2.0064 & 6.2421 \\
+VNet (3D)   & \textbf{0.8633} & \textbf{0.7664} & 1.6688 & 5.5709 \\
+UNETR       & 0.7819 & 0.6777 & 5.2696 & 12.7303 \\
+Swin UNet3D & \textit{0.8446} & \textit{0.7639} & \textbf{1.5692} & \textbf{5.3643} \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{So sánh các phương pháp trên ROI ET}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Phương pháp} & \textbf{Dice $\uparrow$} & \textbf{IoU $\uparrow$} & \textbf{ASD $\downarrow$} & \textbf{HD95 $\downarrow$} \\
+\hline
+UNet        & 0.7148 & 0.5992 & 9.1472 & 18.2997 \\
+UNet++      & 0.7360 & 0.6278 & 1.6917 & 5.0079 \\
+VNet (3D)   & 0.7617 & 0.6650 & 1.6565 & 5.3642 \\
+UNETR (3D)       & 0.6869 & 0.5788 & 4.2527 & 12.4837 \\
+Swin UNet3D & \textbf{0.8084} & \textbf{0.7091} & \textbf{1.1882} & \textbf{4.2647} \\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+
+\textbf{Nhận xét:}\\
+Nhìn chung, các mô hình tiên tiến hơn như UNet++, VNet 3D, UNETR và đặc biệt là Swin UNet3D đều cho kết quả vượt trội so với UNet cơ bản, khẳng định vai trò của việc cải tiến kiến trúc và khai thác ngữ cảnh không gian 3D.\\
+
+Đối với vùng Whole Tumor (WT), Swin UNet3D đạt hiệu năng tốt nhất với Dice và IoU cao nhất, đồng thời duy trì sai số biên (ASD, HD95) ở mức thấp. Điều này cho thấy khả năng mô hình hóa ngữ cảnh toàn cục và thông tin đa tỉ lệ của kiến trúc Swin Transformer giúp cải thiện đáng kể độ chính xác phân đoạn toàn khối u. VNet huấn luyện trên các patch 3D với Dice Loss cũng cho kết quả cạnh tranh, đặc biệt về Dice và IoU, tuy nhiên kém hơn Swin UNet3D ở độ chính xác biên.\\
+
+Đối với vùng Enhancing Tumor (ET), là vùng khó phân đoạn nhất do kích thước nhỏ và độ tương phản không ổn định, Swin UNet3D vượt trội trên tất cả các chỉ số đánh giá. Kết quả này cho thấy mô hình có khả năng học được các đặc trưng ngữ cảnh dài hạn và mối quan hệ không gian phức tạp, giúp cải thiện đáng kể chất lượng phân đoạn đối với các vùng u nhỏ.\\
+
+So với UNet truyền thống, UNet++ cho thấy sự cải thiện nhất quán trên cả ba vùng ROI, đặc biệt ở các chỉ số đo độ chính xác biên (HD95), chứng minh hiệu quả của các kết nối dense skip trong việc thu hẹp khoảng cách ngữ nghĩa giữa encoder và decoder. UNETR, mặc dù khai thác Transformer thuần túy, vẫn chưa đạt hiệu năng cao bằng các mô hình lai CNN–Transformer trong bối cảnh dữ liệu hạn chế.\\
+
+Tổng thể, kết quả thực nghiệm cho thấy Swin UNet3D là mô hình cho hiệu năng toàn diện và ổn định nhất trên hầu hết các vùng ROI và chỉ số đánh giá. Điều này khẳng định tiềm năng của các kiến trúc kết hợp Transformer và CNN trong bài toán phân đoạn khối u não 3D, đặc biệt khi yêu cầu độ chính xác cao ở ranh giới và các vùng u nhỏ.
+

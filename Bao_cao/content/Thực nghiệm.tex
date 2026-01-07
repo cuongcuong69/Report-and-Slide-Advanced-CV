@@ -1,0 +1,192 @@
+\chapter{Thực nghiệm}
+\section{Các độ đo đánh giá}
+Để đánh giá chất lượng mô hình phân đoạn u não trên bộ dữ liệu BraTS2020, chúng ta sử dụng 4 độ đo: Dice Similarity Coefficient (DSC), Intersection over Union (IoU), Average Surface Distance (ASD) và 95th percentile Hausdorff Distance (HD95). Các độ đo này được tính độc lập trên ba vùng giải phẫu:
+\begin{itemize}
+    \item Whole Tumor (WT): tập hợp tất cả vùng u, tương ứng với nhãn 1 (NCR/NET) + 2 (ED) + 3 (ET)
+    \item Tumor Core (TC): khối u lõi, gồm 1 (NCR/NET) + 3 (ET).
+    \item Enhancing Tumor (ET): vùng u tăng tín hiệu (nhãn 3).
+\end{itemize}
+Việc báo cáo kết quả trên từng vùng cho phép đánh giá chi tiết khả năng mô hình phân biệt cấu trúc u phức tạp.
+\begin{enumerate}
+    \item \textbf{Dice và IoU đánh giá mức độ trùng khớp giữa vùng dự đoán $P$ và vùng nhãn chuẩn $G$, chúng được định nghĩa như sau:}
+\begin{align*}
+    \text{DSC}(P, G) = \frac{2|P \cap G|}{|P| + |G|}\\
+    \text{IoU}(P, G) = \frac{|P \cap G|}{|P \cup G|}
+\end{align*}
+Giá trị Dice và IoU nằm trong [0, 1], càng cao biểu thị mức độ trùng khớp càng tốt.
+\item \textbf{Average Surface Distance (ASD)}\\
+ASD đo khoảng cách trung bình giữa bề mặt vùng dự đoán và bề mặt vùng nhãn thực. Cho 2 tập điểm biên bề mặt $S_P$ và $S_G$, ASD được định nghĩa:
+\begin{align*}
+    \text{ASD}(P, G) = \frac{1}{|S_P| + |S_G|}\Bigg(\sum_{p \in S_P}d(p, S_G) + \sum_{g\in S_G}d(g, S_P)\Bigg)
+\end{align*}
+trong đó $d(x, S)$ là khoảng cách Euclidean nhỏ nhất từ điểm $x$ đến tập bề mặt $S$. ASD phản ánh độ trơn và độ gần giữa bề mặt dự đoán và thực tế. Giá trị ASD càng nhỏ biểu thị phân đoạn càng chính xác.
+\item \textbf{95th Percentile Hausdorff Distance (HD95)}\\
+Khoảng cách Hausdorff cổ điển dễ bị ảnh hưởng bởi các điểm nhiễu (outlier). Do đó, trong thực tế, người ta sử dụng HD95 (giá trị phần trăm thứ 95 của phân bố khoảng cách bề mặt hai phía). Cho 2 bề mặt $S_P$ và $S_G$:
+\begin{align*}
+\text{HD95}(P, G) = \max\{\text{percentile}_{95}[d(p, S_G)], \text{percentile}_{95}[d(g, S_P)]\}
+\end{align*}
+HD95 đánh giá sai lệch biên một cách ổn định và không bị chi phối bởi các điểm bất thường đơn lẻ. Giá trị càng thấp biểu thị sai số biên càng nhỏ.
+\end{enumerate}
+\section{Chi tiết triển khai}
+\subsection{Mô hình UNet}
+
+\ding{113}~ \textbf{Thực nghiệm: Huấn luyện mô hình UNet 2D trên các lát cắt 2D từ MRI BraTS2020}
+\begin{itemize}
+\item Optimizer Adam với learning rate khởi tạo là $1\text{e}-3$
+\item Batch size = 8
+\end{itemize}
+Biểu đồ thể hiện quá trình huấn luyện UNet 2D:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/UNet2D_Loss_Curves.png}
+    \caption{Quá trình huấn luyện mô hình UNet 2D: loss train và validation}
+    \label{fig:unet2d-train-curves}
+\end{figure}
+
+
+\subsection{Mô hình UNet++}
+
+\ding{113}~ \textbf{Thực nghiệm : Huấn luyện mô hình U-Net++ trên các lát cắt 2D từ MRI 3D BraTS2020}\\
+{Cài đặt huấn luyện:}
+    \begin{itemize}
+        \item Mô hình được huấn luyện với optimizer Adam, batch size = 8, learning rate ban đầu= $1e-3$ trong 20 epoch. 
+        \item Hàm mất mát DiceCE được sử dụng để huấn luyện mô hình phân đoạn đa nhãn, tối ưu hóa sự trùng khớp giữa dự đoán và ground truth cho từng nhãn riêng biệt.
+    \end{itemize}
+Biểu đồ thể hiện quá trình training:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{img/train_loss_unetpp.png}
+    \caption{Biểu đồ thể hiện quá trình training với Unet++}
+    \label{fig:unetpp_train_loss}
+\end{figure}
+
+
+
+
+
+\subsection{Mô hình VNet}
+\ding{113}~ \textbf{Thử nghiệm 1: Huấn luyện mô hình VNet trực tiếp với trên toàn bộ thể tích MRI 3D của từng ca bệnh, không cắt thành patch:}
+\begin{enumerate}
+    \item \textbf{Dữ liệu đầu vào:}
+    \begin{itemize}
+        \item Mỗi ca gồm 4 chuỗi MRI được resize về $128 \times 128 \times 128$ rồi xếp chồng thành một tensor có kích thước $(4, 128, 128, 128)$.
+        \item Ở tập train, áp dụng các phép augmentation 3D: lật ngẫu nhiên theo trục, biến thiên cường độ, nhiễu Gaussian, phóng/thu thể tích,… nhằm tăng đa dạng dữ liệu.
+    \end{itemize}
+    \item \textbf{Thiết lập huấn luyện:}
+    \begin{itemize}
+        \item Mô hình được huấn luyện với optimizer AdamW, batch size = 2, learning rate ban đầu $1e-3$ trong tối đa 200 epoch. 
+        \item Hàm mất mát sử dụng: DiceCE, trong đó Dice loss được tính trên các lớp foreground.
+        \item Chiến lược giảm learning rate được áp dụng dựa trên Dice trung bình của ba vùng WT, TC, ET trên tập validation.
+    \end{itemize}
+    \item \textbf{Quá trình inference và đánh giá:}\\
+    Ở giai đoạn infernce, volume 4 kênh được resize về $128^3$, đưa qua mạng để thu được mask dự đoán, sau đó resize mask về kích thước ban đầu để đánh giá.
+\end{enumerate}
+Biểu đồ thể hiện quá trình training:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{img/VNet_TN1.png}
+    \caption{Thử nghiệm 1 VNET: Quá trình training}
+    \label{fig:placeholder}
+\end{figure}
+\noindent\ding{113}~ \textbf{Thử nghiệm 2: Huấn luyện VNet trên các patch 3D  thay vì sử dụng toàn bộ thể tích}
+\begin{enumerate}
+    \item \textbf{Dữ liệu đầu vào và chiến lược lấy mẫu patch}\\
+    Khác với thử nghiệm đầu tiên, mô hình không dùng toàn bộ volume mà lấy ra patch 3D có kích thước $128 \times 128 \times 128$ từ khối ảnh. 4 chiến lược lấy mẫu patch bao gồm:
+    \begin{itemize}
+        \item \code{random} $\to$ Crop ngẫu nhiên trong toàn thể tích
+        \item \code{rejection sampling} $\to$ Crop ngẫu nhiên nhưng loại bỏ các patch chứa quá ít foreground
+        \item \code{center\_fg} $\to$ crop patch được căn giữa quanh một voxel thuộc vùng khối u, giúp tập trung vào khu vực quan trọng
+        \item \code{mixed} $\to$ Kết hợp nhiều chiến lược trên theo trọng số\\
+        \textit{Trong các thử nghiệm sử dùng chiến lược này với trọng số 0.5 random và 0.5 center\_fg nhằm tăng tính đa dạng và ổn định của các patch}
+    \end{itemize}
+    Cũng sử dụng data augmentation như trong thử nghiệm 1.
+    \item \textbf{Thiết lập huấn luyện tương tụ thử nghiêm 1.}
+    \item \textbf{Quá trình inference và đánh giá:}\\
+    Do mô hình được huấn luyện theo hướng patch-based, giai đoạn inference sử dụng sliding window 3D trên toàn thể tích để tạo ra dự đoán cuối cùng:
+\begin{itemize}
+    \item Patch: $128^3$
+    \item Stride: $20^3$
+    \item Các vùng chồng lấp được hợp nhất bằng trung bình softmax (probability averaging).
+    \item Dự đoán cuối cùng lấy argmax theo kênh.
+\end{itemize}
+Quy trình này đảm bảo tính toàn cục của kết quả phân đoạn dù mô hình được huấn luyện trên patch.
+\end{enumerate}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{img/VNet-TN2_DiceCE.png}
+    \caption{Huấn luyện VNet trên các patch 3D sử dụng hàm mất mát kết hợp DiceLoss + CELoss}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{img/VNET-TN2_DiceLoss.png}
+    \caption{Huấn luyện VNet trên các patch 3D sử dụng hàm mất mát DiceLoss}
+    \label{fig:placeholder}
+\end{figure}
+\noindent\ding{113}~ \textbf{Thử nghiệm 3: Huấn luyện VNet Multi-Head trên các patch 3D}\\
+Mở rộng VNet thành VNet Multi-Head. Khác với mô hình VNet tiêu chuẩn sử dụng một nhánh dự đoán duy nhất cho phân đoạn đa lớp, mô hình Multi-Head được thiết kế với một encoder-decoder chung nhưng ba đầu ra (head) độc lập, mỗi head đảm nhận một nhiệm vụ phân đoạn nhị phân riêng:
+\begin{itemize}
+    \item WT-head (Whole Tumor): nhận diện toàn bộ vùng u (nhãn > 0)
+    \item TC-head (Tumor Core): nhận diện các voxel thuộc nhân u hoặc vùng tăng tín hiệu (nhãn $\in \{1, 3\}$)
+    \item ET-head (Enhancing Tumor): nhận diện vùng u tăng tín hiệu (nhãn = 3).
+\end{itemize}
+Cách tiếp cận này được kỳ vọng cho phép mô hình tập trung học đặc trưng cho từng cấu trúc giải phẫu mà không phải cạnh tranh trực tiếp trong một không gian phân lớp chung. Đồng thời, việc chia nhỏ nhiệm vụ thành ba bài toán nhị phân giúp giảm độ phức tạp của hàm mất mát và hạn chế ảnh hưởng bất cân bằng giữa các lớp (đặc biệt ET có số lượng rất nhỏ).\\
+
+Tương tự các thử nghiệm trước, việc huấn luyện được thực hiện theo chiến lược patch-based 3D nhằm giảm chi phí bộ nhớ và tăng tính đa dạng của mẫu huấn luyện. Mỗi patch được gán ba mặt nạ nhị phân WT, TC và ET tương ứng để huấn luyện từng head. Sự dụng hàm kết hợp giữa DiceLoss nhị phân + CELoss làm hàm mất mát cho mỗi head. Giá trị hàm mất mát cuối cùng là trung bình của 3 head.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{img/VNet-TN3.png}
+    \caption{Huấn luyện VNet Multi-Head trên các patch 3D}
+    \label{fig:placeholder}
+\end{figure}
+\noindent\ding{113}~ \textbf{Thử nghiệm 4: Huấn luyện VNet Multi-encoder trên các patch 3D}\\
+Khảo sát một biến thể kiến trúc khác của VNet là VNet Multi-encoder. Thay vì xếp chồng 4 kênh đầu vào và đưa qua một encoder duy nhất như các thử nghiệm trước, mô hình VNet multi-encoder sử dụng 4 encoder riêng biệt, mỗi encoder chỉ nhận một modality và học đặc trưng chuyên biệt cho modality đó. Tại mỗi mức độ phân giải trong encoder (tương ứng với các mức 1,..,5 của VNet), các đặc trưng từ 4 nhánh được nối theo chiều kênh và nén lại bằng các lớp tích chập 3D $1 \times1\times 1$ để đưa số kênh về đúng cấu hình VNet gốc. Phần decoder phía sau được giữ nguyên như kiến trúc VNet truyền thống và hoạt động trên các đặc trưng đã được fusion. \\
+
+Thiết kế này cho phép mô hình tách bạch quá trình trích xuất đặc trưng theo từng modality và quá trình hợp nhất thông tin liên-modality ở mức sâu, thay vì buộc mạng phải học đồng thời cả hai nhiệm vụ ngay từ các lớp đầu tiên. Về mặt trực giác, các encoder riêng có thể tập trung học những mẫu hình đặc trưng của từng loại ảnh (ví dụ FLAIR nhạy với edema, T1ce nhấn mạnh vùng u tăng tương phản), trong khi các lớp nén $1 \times 1 \times 1$. Đổi lại, mô hình trở nên nặng hơn đáng kể (xấp xỉ gấp bốn lần số tham số ở phần encoder) và yêu cầu bộ nhớ GPU lớn hơn; do đó trong thực nghiệm chúng tôi giảm kích thước batch size = 1 để đảm bảo huấn luyện ổn định trên cùng cấu hình phần cứng.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{img/VNET-TN4.png}
+    \caption{Huấn luyện VNet Multi-Encoder trên các patch 3D}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Mô hình UNETR}
+
+\ding{113}~ \textbf{Thử nghiệm: Huấn luyện mô hình UNETR trực tiếp trên toàn bộ thể tích MRI 3D của từng ca bệnh, không cắt thành patch:}
+\begin{enumerate}
+    \item \textbf{Dữ liệu đầu vào:}
+    \begin{itemize}
+        \item Mỗi ca gồm 4 chuỗi MRI được resize về $128 \times 128 \times 128$ rồi xếp chồng thành một tensor có kích thước $(4, 128, 128, 128)$.
+        \item Dữ liệu được chuẩn hóa theo z-score trên vùng khác không (\textit{non-zero}), sau đó được cắt ngưỡng (\textit{clipped}) về khoảng $[-5, 5]$ nhằm hạn chế ảnh hưởng của các giá trị ngoại lai (\textit{outliers}).
+        \item Ở tập train, áp dụng các phép augmentation 3D: lật ngẫu nhiên theo trục, biến thiên cường độ, nhiễu Gaussian, phóng/thu thể tích,… nhằm tăng đa dạng dữ liệu.
+    \end{itemize}
+
+    \item \textbf{Thiết lập huấn luyện:}
+    \begin{itemize}
+        \item Mô hình được huấn luyện với optimizer AdamW, batch size = 4, learning rate ban đầu $1 \times 10^{-4}$ trong tối đa 150 epoch.
+        \item Hàm mất mát sử dụng: là hàm kết hợp (\textit{Combined Loss}) giữa Dice Loss và Cross-Entropy Loss, trong đó Dice Loss được tính trên các lớp foreground (bỏ qua lớp background), còn Cross-Entropy Loss được tính trên toàn bộ bốn lớp.
+
+    \end{itemize}
+    \item \textbf{Quá trình inference và đánh giá:}\\
+    Ở giai đoạn infernce, volume 4 kênh được resize về $128^3$, đưa qua mạng để thu được mask dự đoán, sau đó resize mask về kích thước ban đầu để đánh giá.
+
+\end{enumerate}
+
+Biểu đồ thể hiện quá trình training:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{img/unetr_training.png}
+    \caption{ Biểu đồ quá trình training với UNETR}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Mô hình  Swin UNet3D}
+Tương tự  thực hiện huấn luyện mô hình Swin UNet 3D trên các patch 3D.
+
+
+
+
+
+

@@ -1,0 +1,36 @@
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Các chuỗi MRI đa phương thức cùng với vùng phân đoạn bằng tay tương ứng của khối u não}}{2}{figure.caption.4}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Các kết quả thống kê cho nhóm HGG}}{8}{figure.caption.5}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Các kết quả thống kê cho nhóm LGG}}{9}{figure.caption.6}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Minh họa một lát cắt trên 4 chuỗi MRI (Flair, T1, T1CE, T2) và nhãn phân đoạn của nó}}{11}{figure.caption.8}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Sơ đồ tổng quan kiến trúc U-Net \cite {ronneberger2015unet}}}{14}{figure.caption.11}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Kiến trúc tổng quan và skip connections của UNet++}}{17}{figure.caption.12}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Sơ đồ tổng quan kiến trúc V-Net}}{19}{figure.caption.14}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces VNet downsample sử dụng tích chập 3D với kernel size $2 \times 2 \times 2$ và stride = 2}}{20}{figure.caption.15}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces VNet upsampling sử dụng transposed convolution 3D với kernel size $2 \times 2 \times 2$ và stride = 2}}{21}{figure.caption.16}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Tổng quan về UNETR}}{22}{figure.caption.17}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Sơ đồ tổng quan kiến trúc UNETR}}{22}{figure.caption.18}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Kiến trúc tổng thể và các khối chính trong từng stage của Swin UNet3D}}{24}{figure.caption.19}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Quá trình huấn luyện mô hình UNet 2D: loss train và validation}}{30}{figure.caption.20}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Biểu đồ thể hiện quá trình training với Unet++}}{30}{figure.caption.21}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Thử nghiệm 1 VNET: Quá trình training}}{32}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Huấn luyện VNet trên các patch 3D sử dụng hàm mất mát kết hợp DiceLoss + CELoss}}{33}{figure.caption.23}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Huấn luyện VNet trên các patch 3D sử dụng hàm mất mát DiceLoss}}{34}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Huấn luyện VNet Multi-Head trên các patch 3D}}{35}{figure.caption.25}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Huấn luyện VNet Multi-Encoder trên các patch 3D}}{36}{figure.caption.26}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Biểu đồ quá trình training với UNETR}}{37}{figure.caption.27}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Ví dụ kết quả phân đoạn của UNet 2D trên một lát cắt: ảnh MRI đầu vào, mask ground truth và mask dự đoán cho các vùng WT, TC, ET}}{39}{figure.caption.31}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Kết quả dự đoán của mô hình trên lát cắt 88 của ca chụp 90}}{40}{figure.caption.33}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Kết quả phân đoạn của VNet trên lát cắt thứ 75 của ca chụp 11}}{42}{figure.caption.37}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 104}}{43}{figure.caption.38}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 193}}{43}{figure.caption.39}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Kết quả phân đoạn của UNETR trên lát cắt thứ 88 của ca chụp 091}}{44}{figure.caption.41}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Kết quả phân đoạn của UNETR trên lát cắt thứ 75 của ca chụp 011}}{44}{figure.caption.42}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Kết quả phân đoạn của Swin UNet3D trên lát cắt thứ 88 của ca chụp 091}}{45}{figure.caption.44}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Kết quả phân đoạn của Swin UNet3D trên lát cắt thứ 75 của ca chụp 011}}{46}{figure.caption.45}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 104}}{46}{figure.caption.46}%
+\contentsline {figure}{\numberline {5.11}{\ignorespaces Kết quả dựng mesh 3D kết quả dự đoán và ground truth (màu xanh lá) của ca chụp 193}}{46}{figure.caption.47}%

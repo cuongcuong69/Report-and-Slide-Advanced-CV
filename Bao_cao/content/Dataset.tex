@@ -1,0 +1,189 @@
+\chapter{Bộ dữ liệu}
+\section{BraTS2020}
+\ding{113}~ \textbf{Mô tả dữ liệu:}\\
+Brain Tumor Segmentation Challenge 2020 (BraTS2020) là một trong những bộ dữ liệu chuẩn mực cho bài toán phân đoạn u não trên ảnh cộng hưởng từ (MRI) đa chuỗi. Bộ dữ liệu được xây dựng dựa trên MRI trước phẫu thuật của các bệnh nhân mắc u não dạng glioma, được thu thập từ nhiều trung tâm lâm sàng khác nhau nhằm đảm bảo tính đa dạng và khả năng tổng quát hóa của mô hình.\\
+
+Bộ dữ liệu BraTS2020 bao gồm tổng cộng \textbf{369 trường hợp có nhãn và 125 trường hợp không có nhãn}. Đối với mỗi bệnh nhân, dữ liệu được cung cấp dưới dạng bốn chuỗi MRI khác nhau, bao gồm: \textbf{T1, T1ce, T2, Flair}. Ngoài bốn chuỗi ảnh đầu vào, mỗi trường hợp trong tập có nhãn đi kèm một bản đồ phân đoạn (segmentation labelmap) chứa chú thích của chuyên gia lâm sàng. Các chú thích này phân biệt những vùng u khác nhau, bao gồm bốn giá trị nhãn:
+\begin{itemize}
+    \item 0 -- background
+    \item 1 -- Vùng hoại tử hoặc nhân u không bắt thuốc tương phản (\textbf{NCR/NET})
+    \item 2 -- Vùng phù quanh u (\textbf{ED})
+    \item 4 --  Vùng u tăng tín hiệu sau tiêm thuốc tương phản (\textbf{ET})
+\end{itemize}
+Tất cả dữ liệu ảnh MRI được cung cấp dưới định dạng NIfTI (\code{.nii.gz}) đã được tiền xử lý trước:
+\begin{itemize}
+    \item Loại bỏ hộp sọ
+    \item Chuẩn hóa không gian
+    \item Resample về độ phân giải đẳng hướng $1\times 1\times 1$ mm$^3$
+    \item Chuẩn hóa kích thước về dạng thể tích cố định $240 \times 240 \times 155$ voxel.
+\end{itemize}
+\section{Tiền xử lý dữ liệu}
+Xây dựng hai nhánh tiền xử lý dữ liệu song song, tương ứng với 2 hướng tiếp cận mô hình:
+\begin{itemize}
+    \item[(i)] Mô hình phân đoạn làm việc trên các lát cắt 2D
+    \item[(ii)] Mô hình phân đoạn thể tích 3D.
+\end{itemize}
+Hai pipeline này được thiết kế sao cho nhất quán về mặt chuẩn hóa cường độ và mã hóa nhãn, đồng thời tối ưu chi phí tính toán cho từng cấu hình mô hình.
+\subsection{Tiền xử lý dữ liệu 2D và tách lát cắt}
+Đối với bài toán phân đoạn 2D, dữ liệu thể tích MRI 3D được chuyển đổi thành tập các lát cắt 2D chuẩn hóa.\\
+Quy trình gồm các bước chính sau:
+\begin{enumerate}
+    \item[\ding{182}] \textbf{Xác định vùng quan tâm toàn cục trên mặt phẳng 2D}\\
+    Trước hết, sử dụng chuỗi T1 của tất cả các ca (cả có nhãn và không nhãn) để xác định vùng não trên mặt phẳng không gian hai chiều. Với mỗi thể tích, vùng mô não được suy ra từ các voxel có cường độ khác 0. Tập hợp các tọa độ này trên toàn bộ bệnh nhân được dùng để tìm một bounding box 2D tối thiểu bao phủ toàn bộ não trên mặt phẳng $(x, y)$.\\
+
+    Bounding box này sau đó được điều chỉnh lại thành hình vuông để khi resize ảnh, cấu trúc giải phẩu không bị biến dạng. Việc sử dụng một bounding box vuông, cố định cho mọi trường hợp đảm bảo rằng tất cả các lát 2D được cắt từ cùng một vùng giải phẫu tương đương, giảm diện tích nền không chứa não và tập trung mô hình vào vùng thông tin quan trọng.
+    \item[\ding{183}] \textbf{Chuẩn hóa cường độ bằng percentile}\\
+    Đối với từng ca và từng chuỗi MRI, cường độ ảnh được chuẩn hóa độc lập. Chúng ta chỉ xét các voxel khác 0 (tương ứng với mô não), tính các ngưỡng percentile thấp và cao (ví dụ 1-percentile, 99-percentile), sau đó:
+    \begin{itemize}
+        \item Cắt ngưỡng cường độ về khoảng $[p_{\min}, p_{\max}]$
+        \item Normalize về khoảng [0, 1]
+        \item Các voxel nền ban đầu vẫn có giá trị 0.
+    \end{itemize}
+    Chuẩn hóa theo percentile giúp giảm ảnh hưởng của các giá trị ngoại lai, đồng thời đảm bảo phân bố cường độ ổn định hơn giữa các bệnh nhân và các chuỗi.
+    \item[\ding{184}] \textbf{Cắt lát axial, crop và căn chỉnh hướng}\\
+    Sau khi chuẩn hóa cường độ, mỗi thể tích 3D được cắt thành các lát cắt 2D theo mặt phẳng axial. Đối với mỗi lát, crop theo bounding box đã xác định ở bước 1, đảm bảo mỗi lát 2D chỉ chứa vùng não và loại bỏ phần lớn nền xung quanh.\\
+    Để đảm bảo hướng hiển thị nhất quán giữa các lát, các phép quay hoặc lật đơn giản có thể được áp dụng sau khi crop, sao cho não được “dựng thẳng” theo một quy ước chung. Bước này giúp thuận lợi hơn trong trực quan hóa kết quả và không làm thay đổi thông tin giải phẫu.
+    \item[\ding{185}] \textbf{Resize ảnh và mã hóa nhãn}\\
+    Các lát cắt sau khi được crop sẽ được resize về kích thước $256 \times 256$ nhằm thống nhất kích thước ban đầu cho các mô hình 2D. Đối với ảnh cường độ (các chuỗi MRI), phép nội suy tuyến tính được sử dụng để bảo toàn cấu trúc cường độ. Đối với mặt nạ phân đoạn, nội suy lân cận gần nhất được sử dụng để tránh tạo ra các giá trị nhãn trung gian không hợp lệ.\\
+
+    Mặt nạ phân đoạn được mã hóa lại sao cho nhãn vùng u tăng tín hiệu ET (gốc là 4) được ánh xạ thành 3, tạo thành bộ nhãn $\{0,1,2,3\}$ liên tục.
+\end{enumerate}
+\subsection{Tiền xử lý dữ liệu 3D}
+Quy trình tiền xử lý dữ liệu 3D bao gồm các bước:
+\begin{enumerate}
+    \item[\ding{182}] \textbf{Cắt giảm không gian quan tâm trong thể tích 3D}\\
+    Để loại bỏ vùng nền ít thông tin và tối ưu tài nguyên tính toán, chúng tôi áp dụng một cửa sổ cắt cố định trên hai trục không gian $(x, y)$, giữ nguyên toàn bộ chiều sâu. Vùng cắt được lựa chọn sao cho bao phủ đầy đủ toàn bộ não và khối u đối với mọi bệnh nhân, nhưng loại bỏ phần rìa ngoài chủ yếu là nền.
+
+    \item[\ding{183}] \textbf{Chuẩn hóa cường độ voxel trên mô não}\\
+    Tương tự tiền xử lý 2D, cường độ của các thể tích 3D được chuẩn hóa riêng cho từng trường hợp và từng chuỗi, nhưng theo kiểu thống kê toàn thể tích. . Chỉ các voxel khác 0 (tương ứng với mô não) được dùng để tính thống kê.\\
+
+    Sử dụng chuẩn hóa z-score trên non-zero voxels, đưa cường độ về phân phối có trung bình xấp xỉ 0 và độ lệch chuẩn xấp xỉ 1. Các voxel nền được giữ nguyên bằng 0, giúp mô hình dễ dàng phân biệt giữa nền và mô não.
+    \item[\ding{184}] \textbf{Chuẩn hóa nhãn phân đoạn trong thể tích 3D}\\
+    Mặt nạ phân đoạn 3D gốc sử dụng các nhãn {0,1,2,4}. Tương tự như tiền xử lý 2D, thực hiện ánh xạ nhãn 4 (vùng u tăng tín hiệu) thành 3, thu được bộ nhãn {0,1,2,3}.
+\end{enumerate}
+\section{Thống kê và phân tích bộ dữ liệu}
+\subsection{Phân tích phân bố thể tích của các vùng khối u (WT, TC, ET)}
+Để hiểu rõ hơn đặc tính hình thái của dữ liệu và đánh giá mức độ khác biệt giữa các nhóm u não, chúng tôi tiến hành phân tích thể tích của ba vùng quan trọng trong bộ dữ liệu BraTS2020, bao gồm Whole Tumor (WT), Tumor Core (TC) và Enhancing Tumor (ET). Phân tích được thực hiện riêng cho hai nhóm bệnh nhân High-Grade Glioma (HGG) và Low-Grade Glioma (LGG), nhằm làm rõ sự khác biệt về quy mô u giữa hai phân nhóm lâm sàng quan trọng này
+\begin{enumerate}
+\begin{comment}
+    \item[(a)] \textbf{Thống kê trên cả tập HGG và LGG}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=1.1\linewidth]{img/image1.png}
+                \caption{Biểu đồ histogram thể tích các vùng WT / TC / ET}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+                \centering
+                \includegraphics[width=1.1\linewidth]{img/image2.png}
+                \caption{Tỷ lệ phần trăm trung bình của WT / TC / ET so với thể tích não}
+    \end{minipage}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{img/image3.png}
+    \caption{Biểu đồ violin thể tích WT / TC / ET}
+\end{figure}
+\end{comment}
+\item[(a)] \textbf{Thống kê riêng cho nhóm HGG}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+            \centering
+            \includegraphics[width=1.1\linewidth]{img/image4.png}
+            \caption{Biểu đồ histogram thể tích các vùng WT / TC / ET cho nhóm HGG}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+                \centering
+                \includegraphics[width=1.1\linewidth]{image5.png}
+                \caption{Tỷ lệ phần trăm trung bình của WT / TC / ET so với thể tích não (nhóm HGG)}
+    \end{subfigure}
+    \vfill
+    \begin{subfigure}[b]{1\textwidth}
+            \centering
+        \includegraphics[width=0.6\linewidth]{image6.png}
+            \caption{Biểu đồ violin thể tích WT / TC / ET (nhóm HGG)}
+    \end{subfigure}
+    \caption{Các kết quả thống kê cho nhóm HGG}
+\end{figure}
+\item[(b)] \textbf{Thống kê riêng cho nhóm LGG}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+                \centering
+                \includegraphics[width=1.1\linewidth]{img/image7.png}
+            \caption{Biểu đồ histogram thể tích các vùng WT / TC / ET cho nhóm LGG}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+                    \centering
+                    \includegraphics[width=1.1\linewidth]{img/image8.png}
+                \caption{Tỷ lệ phần trăm trung bình của WT / TC / ET so với thể tích não (nhóm LGG)}
+    \end{subfigure}
+    \vfill
+    \begin{subfigure}[b]{1\textwidth}
+        \centering
+    \includegraphics[width=0.6\linewidth]{img/image9.png}
+    \caption{Biểu đồ violin thể tích WT / TC / ET (nhóm LGG)}
+    \end{subfigure}
+    \caption{Các kết quả thống kê cho nhóm LGG}
+\end{figure}
+\end{enumerate}
+Kết quả phân tích cho thấy sự khác biệt rõ rệt về phân bố khối u giữa HGG và LGG, phù hợp với các nghiên cứu lâm sàng:
+\begin{itemize}
+    \item HGG thường có kích thước WT, TC và ET lớn hơn, đồng thời phân bố thể tích trải rộng và không đồng nhất hơn.
+    \item LGG thường có vùng ET rất nhỏ hoặc không xuất hiện, phản ánh mức độ tăng sinh thấp và tiến triển chậm.
+    \item Sự khác biệt này có ý nghĩa quan trọng trong cả bài toán phân đoạn và bài toán phân loại mức độ ác tính, và cũng cho thấy cần thận trọng khi thiết kế mô hình để tránh thiên lệch về nhóm bệnh nhân có khối u lớn (thường là HGG).
+\end{itemize}
+\subsection{So sánh đặc trưng tín hiệu giữa các modality MRI}
+Để đánh giá mức độ bổ sung thông tin giữa các chuỗi MRI, tiến hành tính hệ số tương quan Pearson dựa trên cường độ trung bình của từng modality trong vùng khối u và trực quan hóa bằng heatmap.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{Ma trận tương quan.png}
+\end{figure}
+Ma trận tương quan cho thấy các đặc điểm sau:
+\begin{itemize}
+    \item T1 và T1CE có tương quan mạnh ($r = 0.61$)\\
+    Điều này phản ánh sự tương đồng về bản chất vật lý của hai chuỗi ảnh: T1CE (T1 có tiêm thuốc đối quang từ gadolinium) thực chất là phiên bản tăng cường tín hiệu của T1, đặc biệt ở các vùng u tăng sinh mạch. Mức tương quan cao cho thấy hai chuỗi này có thông tin liên quan nhưng không hoàn toàn trùng lặp, do sự khác biệt giữa mô tăng sinh và mô không bắt thuốc.
+    \item FLAIR có tương quan thấp với các modality còn lại\\
+    $\to$ Phù hợp với đặc tính lâm sàng: Flair nhạy với vùng phù (ED), trong khi T1/T1CE phản ánh cấu trúc và mức độ tăng sinh mạch. Sự khác biệt này giúp FLAIR đóng vai trò bổ sung quan trọng trong việc mô tả ranh giới WT.
+    \item T2 có tương quan rất thấp hoặc âm nhẹ với FLAIR ($r = –0.16$).\\
+    Mặc dù FLAIR và T2 đều nhạy với mô chứa dịch, phản ứng của chúng trong vùng u có thể khác nhau do sự ức chế tín hiệu dịch tự do trong FLAIR, làm giảm tương quan giữa hai chuỗi.
+    \item T2 có tương quan yếu với T1 và T1CE (0.10–0.14) \\
+    $\to$ T2 cung cấp thông tin ít trùng lặp với các chuỗi cấu trúc, góp phần tăng tính đa dạng thông tin đầu vào cho mô hình phân đoạn.
+\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/Hình minh họa trên 1 lát cắt.png}
+    \caption{Minh họa một lát cắt trên 4 chuỗi MRI (Flair, T1, T1CE, T2) và nhãn phân đoạn của nó}
+\end{figure}
+Vì vậy, ta có thể kết luận:
+\begin{itemize}
+    \item T1CE mang tính đại diện mạnh cho vùng ET, nhưng T1 vẫn cung cấp thông tin bổ sung.
+    \item FLAIR và T2 bổ sung thông tin cho nhau, đặc biệt trong mô tả ranh giới WT và vùng phù.
+    \item Sự đa dạng tín hiệu giữa các modality là cơ sở quan trọng cho việc sử dụng mô hình đa chuỗi (multi-modal learning), giúp mô hình học được các đặc trưng không gian–cường độ phức tạp của khối u glioma.
+    \item Tương quan thấp giữa nhiều cặp modality cho thấy việc loại bỏ hoặc gộp các chuỗi ảnh không nên thực hiện đơn giản, bởi chúng đóng góp các đặc trưng khác biệt.
+\end{itemize}
+\section{Phân chia tập dữ liệu}
+Sau khi hoàn tất bước tiền xử lý, dữ liệu được chia thành các tập con phục vụ huấn luyện, hiệu chỉnh và đánh giá mô hình. Việc phân chia được thực hiện trên mức bệnh nhân, thay vì trên mức lát cắt, nhằm đảm bảo rằng dữ liệu từ cùng một bệnh nhân không bị rò rỉ giữa các tập train, validation và test.\\
+
+Toàn bộ 369 ca có nhãn sẽ được chia thành 3 tập:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Tập & Tỷ lệ & Số ca chụp \\
+        \midrule
+        Tập train        & 70\% & 258 \\
+        Tập validation    & 15\% & 55  \\
+        Tập test         & 15\% & 56  \\
+        \midrule
+    \end{tabular}
+\end{table}
+\textbf{Phân tầng và đảm bảo tính công bằng khi chia dữ liệu}\\
+Để đảm bảo các tập train, validation và test có phân bố đặc trưng khối u tương đồng, quá trình chia dữ liệu được thực hiện theo chiến lược phân tầng thay vì chia ngẫu nhiên. Mỗi trường hợp bệnh nhân được mô tả bằng một số đặc trưng tổng hợp rút ra từ mặt nạ phân đoạn 2D, bao gồm: có/không có khối u, có/không có vùng u tăng tín hiệu (Enhancing Tumor), tổng diện tích khối u và số lát chứa u. Đồng thời, nhãn độ ác tính (HGG, LGG hoặc Unknown) được gắn cho từng ca dựa trên metadata.\\
+
+Từ các đặc trưng này, chúng tôi xây dựng nhóm phân tầng kết hợp ba yếu tố: độ ác tính, sự hiện diện của vùng Enhancing Tumor và nhóm kích thước khối u (dựa theo quantile). Trong trường hợp một số nhóm có quá ít mẫu, các nhóm này được tự động gộp theo thứ tự giảm dần độ chi tiết để duy trì sự cân bằng. Việc chia train/validation/test được thực hiện ở mức bệnh nhân, với hạt giống ngẫu nhiên cố định nhằm đảm bảo tính tái lập và tránh rò rỉ dữ liệu. Cách tiếp cận này giúp duy trì phân bố tương đối đồng đều giữa các tập và đảm bảo kết quả đánh giá phản ánh đúng khả năng tổng quát hóa của mô hình.
